@@ -24,10 +24,11 @@ configs = [
     ("quantized_sentence_bert_keys.txt", "sentence_bert_embeddings_train.npy"),
     (None, "yandex_10000000.npy"),
     (None, "yandex_100000000.npy"),
-    (None, "yandex_1000000000.npy"),
+    # (None, "yandex_1000000000.npy"),
 ]
 
 if __name__ == "__main__":
+    base_path = "/share/data/caramel/"
     for keys, values in configs:
-        keys_str = f"--keys {keys}" if keys != None else ""
-        os.system(f"python3 benchmark_caramel.py {keys_str} --values {values}")
+        keys_str = f"--keys {base_path}{keys}" if keys != None else ""
+        os.system(f"python3 benchmark_caramel.py {keys_str} --values {base_path}{values}")

@@ -1,0 +1,16 @@
+None | /share/data/caramel/synthetic_uniform_10k_rows.npy
+{'num_rows': 10000, 'num_columns': 1000, 'most_common_prob': 0.0010342, 'keys_size_bytes': 40000, 'values_size_bytes': 40000000, 'total_size_bytes': 40040000, 'entropy_bits': 9.965711600149412}
+{'caramel_size_bytes': 36864, 'caramel_size_MB': 0.036864, 'caramel_size_GB': 3.6864e-05, 'construction_time': 38.07881283760071, 'average_query_time': 0.0016097221374511718}
+
+None | /share/data/caramel/synthetic_uniform_100k_rows.npy
+{'num_rows': 100000, 'num_columns': 1000, 'most_common_prob': 0.00101196, 'keys_size_bytes': 400000, 'values_size_bytes': 400000000, 'total_size_bytes': 400400000, 'entropy_bits': 9.965777196166568}
+{'caramel_size_bytes': 36864, 'caramel_size_MB': 0.036864, 'caramel_size_GB': 3.6864e-05, 'construction_time': 351.82080721855164, 'average_query_time': 0.0016834218502044679}
+
+None | /share/data/caramel/synthetic_power_law_10k_rows.npy
+{'num_rows': 10000, 'num_columns': 1000, 'most_common_prob': 0.6081595, 'keys_size_bytes': 40000, 'values_size_bytes': 40000000, 'total_size_bytes': 40040000, 'entropy_bits': 2.3493551393358723}
+{'caramel_size_bytes': 36864, 'caramel_size_MB': 0.036864, 'caramel_size_GB': 3.6864e-05, 'construction_time': 14.674746036529541, 'average_query_time': 0.0013049585819244385}
+
+None | /share/data/caramel/synthetic_power_law_100k_rows.npy
+{'num_rows': 100000, 'num_columns': 1000, 'most_common_prob': 0.60833534, 'keys_size_bytes': 400000, 'values_size_bytes': 400000000, 'total_size_bytes': 400400000, 'entropy_bits': 2.3483854274249203}
+{'caramel_size_bytes': 36864, 'caramel_size_MB': 0.036864, 'caramel_size_GB': 3.6864e-05, 'construction_time': 108.39345717430115, 'average_query_time': 0.0017349059581756592}
+

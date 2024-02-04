@@ -109,3 +109,8 @@ if __name__ == "__main__":
 
     caramel_metrics = construct_caramel(keys, values)
     print("Caramel Metrics: ", caramel_metrics)
+
+    with open("benchmark_numbers.txt", "a") as f:
+        f.write(f"{args.keys} | {args.values}\n")
+        f.write(f"{data_metrics}\n")
+        f.write(f"{caramel_metrics}\n\n")
