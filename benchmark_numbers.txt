@@ -1,16 +1,44 @@
-None | /share/data/caramel/synthetic_uniform_10k_rows.npy
-{'num_rows': 10000, 'num_columns': 1000, 'most_common_prob': 0.0010342, 'keys_size_bytes': 40000, 'values_size_bytes': 40000000, 'total_size_bytes': 40040000, 'entropy_bits': 9.965711600149412}
-{'caramel_size_bytes': 36864, 'caramel_size_MB': 0.036864, 'caramel_size_GB': 3.6864e-05, 'construction_time': 38.07881283760071, 'average_query_time': 0.0016097221374511718}
+None | /share/data/caramel/genomes_minH_block100.npy
+{'entropy_bits': 8744.41980796738, 'total_size_mb': 501.969468, 'total_size_gb': 0.501969468, 'num_rows': 125367, 'num_columns': 1000, 'most_common_prob': 0.0005258481099491892, 'values_size_mb': 501.468, 'keys_size_mb': 0.501468}
+{'caramel_size_bytes': 425819098, 'caramel_size_MB': 425.819098, 'caramel_size_GB': 0.425819098, 'construction_time': 1226.209487915039, 'average_query_time': 0.002902904748916626}
 
-None | /share/data/caramel/synthetic_uniform_100k_rows.npy
-{'num_rows': 100000, 'num_columns': 1000, 'most_common_prob': 0.00101196, 'keys_size_bytes': 400000, 'values_size_bytes': 400000000, 'total_size_bytes': 400400000, 'entropy_bits': 9.965777196166568}
-{'caramel_size_bytes': 36864, 'caramel_size_MB': 0.036864, 'caramel_size_GB': 3.6864e-05, 'construction_time': 351.82080721855164, 'average_query_time': 0.0016834218502044679}
+None | /share/data/caramel/proteomes_minH_block100.npy
+{'entropy_bits': 8744.41980796738, 'total_size_mb': 501.969468, 'total_size_gb': 0.501969468, 'num_rows': 125367, 'num_columns': 1000, 'most_common_prob': 0.0005258481099491892, 'values_size_mb': 501.468, 'keys_size_mb': 0.501468}
+{'caramel_size_bytes': 425819098, 'caramel_size_MB': 425.819098, 'caramel_size_GB': 0.425819098, 'construction_time': 1121.933334827423, 'average_query_time': 0.0020627617835998536}
 
-None | /share/data/caramel/synthetic_power_law_10k_rows.npy
-{'num_rows': 10000, 'num_columns': 1000, 'most_common_prob': 0.6081595, 'keys_size_bytes': 40000, 'values_size_bytes': 40000000, 'total_size_bytes': 40040000, 'entropy_bits': 2.3493551393358723}
-{'caramel_size_bytes': 36864, 'caramel_size_MB': 0.036864, 'caramel_size_GB': 3.6864e-05, 'construction_time': 14.674746036529541, 'average_query_time': 0.0013049585819244385}
+/share/data/caramel/word2vec_keys.txt | /share/data/caramel/word2vec_quantized_embeddings_M5_uint8.npy
+{'entropy_bits': 149.5035149742483, 'total_size_mb': 358.336277, 'total_size_gb': 0.358336277, 'num_rows': 4027145, 'num_columns': 20, 'most_common_prob': 0.007843832293100943, 'values_size_mb': 322.1716, 'keys_size_mb': 36.164677}
+{'caramel_size_bytes': 85101462, 'caramel_size_MB': 85.101462, 'caramel_size_GB': 0.085101462, 'construction_time': 440.4318015575409, 'average_query_time': 0.00011716103553771972}
 
-None | /share/data/caramel/synthetic_power_law_100k_rows.npy
-{'num_rows': 100000, 'num_columns': 1000, 'most_common_prob': 0.60833534, 'keys_size_bytes': 400000, 'values_size_bytes': 400000000, 'total_size_bytes': 400400000, 'entropy_bits': 2.3483854274249203}
-{'caramel_size_bytes': 36864, 'caramel_size_MB': 0.036864, 'caramel_size_GB': 3.6864e-05, 'construction_time': 108.39345717430115, 'average_query_time': 0.0017349059581756592}
+None | /share/data/caramel/malicious_phish_counts.npy
+{'entropy_bits': 5.716973259485199, 'total_size_mb': 3.2, 'total_size_gb': 0.0032, 'num_rows': 400000, 'num_columns': 1, 'most_common_prob': 0.0581225, 'values_size_mb': 1.6, 'keys_size_mb': 1.6}
+{'caramel_size_bytes': 331166, 'caramel_size_MB': 0.331166, 'caramel_size_GB': 0.000331166, 'construction_time': 1.8989031314849854, 'average_query_time': 7.513999938964843e-06}
+
+None | /share/data/caramel/aol_terms_2.npy
+{'entropy_bits': 39.48078276437624, 'total_size_mb': 6.291456, 'total_size_gb': 0.006291456, 'num_rows': 262144, 'num_columns': 5, 'most_common_prob': 0.018161773681640625, 'values_size_mb': 5.24288, 'keys_size_mb': 1.048576}
+{'caramel_size_bytes': 1584781, 'caramel_size_MB': 1.584781, 'caramel_size_GB': 0.001584781, 'construction_time': 9.009689807891846, 'average_query_time': 7.116222381591797e-05}
+
+None | /share/data/caramel/aol_terms_2.npy
+{'entropy_bits': 39.48078276437624, 'total_size_mb': 6.291456, 'total_size_gb': 0.006291456, 'num_rows': 262144, 'num_columns': 5, 'most_common_prob': 0.018161773681640625, 'values_size_mb': 5.24288, 'keys_size_mb': 1.048576}
+{'caramel_size_bytes': 1584781, 'caramel_size_MB': 1.584781, 'caramel_size_GB': 0.001584781, 'construction_time': 8.668588876724243, 'average_query_time': 0.00011152243614196778}
+
+None | /share/data/caramel/aol_terms_2.npy
+{'entropy_bits': 39.48078276437624, 'total_size_mb': 6.291456, 'total_size_gb': 0.006291456, 'num_rows': 262144, 'num_columns': 5, 'most_common_prob': 0.018161773681640625, 'values_size_mb': 5.24288, 'keys_size_mb': 1.048576}
+{'caramel_size_bytes': 1584781, 'caramel_size_MB': 1.584781, 'caramel_size_GB': 0.001584781, 'construction_time': 8.521183490753174, 'average_query_time': 0.00015866613388061524}
+
+None | /share/data/caramel/aol_terms_2.npy
+{'entropy_bits': 39.48078276437624, 'total_size_mb': 6.291456, 'total_size_gb': 0.006291456, 'num_rows': 262144, 'num_columns': 5, 'most_common_prob': 0.018161773681640625, 'values_size_mb': 5.24288, 'keys_size_mb': 1.048576}
+{'caramel_size_bytes': 1584781, 'caramel_size_MB': 1.584781, 'caramel_size_GB': 0.001584781, 'construction_time': 8.511494636535645, 'average_query_time': 0.00014067840576171875}
+
+None | /share/data/caramel/aol_terms_2.npy
+{'entropy_bits': 39.48078276437624, 'total_size_mb': 6.291456, 'total_size_gb': 0.006291456, 'num_rows': 262144, 'num_columns': 5, 'most_common_prob': 0.018161773681640625, 'values_size_mb': 5.24288, 'keys_size_mb': 1.048576}
+{'caramel_size_bytes': 1584781, 'caramel_size_MB': 1.584781, 'caramel_size_GB': 0.001584781, 'construction_time': 8.625316619873047, 'average_query_time': 0.0004521088600158691}
+
+None | /share/data/caramel/aol_terms_2.npy
+{'entropy_bits': 39.48078276437624, 'total_size_mb': 6.291456, 'total_size_gb': 0.006291456, 'num_rows': 262144, 'num_columns': 5, 'most_common_prob': 0.018161773681640625, 'values_size_mb': 5.24288, 'keys_size_mb': 1.048576}
+{'caramel_size_bytes': 1584781, 'caramel_size_MB': 1.584781, 'caramel_size_GB': 0.001584781, 'construction_time': 8.108316898345947, 'average_query_time': 0.00013111019134521486}
+
+None | /share/data/caramel/aol_terms_2.npy
+{'entropy_bits': 39.48078276437624, 'total_size_mb': 6.291456, 'total_size_gb': 0.006291456, 'num_rows': 262144, 'num_columns': 5, 'most_common_prob': 0.018161773681640625, 'values_size_mb': 5.24288, 'keys_size_mb': 1.048576}
+{'caramel_size_bytes': 1584781, 'caramel_size_MB': 1.584781, 'caramel_size_GB': 0.001584781, 'construction_time': 7.7014288902282715, 'average_query_time': 0.00014070463180541993}
 

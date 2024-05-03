@@ -35,14 +35,28 @@ def read_keys(keys_path, values_size):
     raise ValueError("Invalid keys path")
 
 
-def empirical_entropy(x):
+def single_empirical_entropy(x):
     unique_values, unique_counts = np.unique(x, return_counts=True)
     num_entries = np.sum(unique_counts)
     sorted_indices = unique_counts.argsort()
-    sorted_values = unique_values[sorted_indices[::-1]]
     sorted_counts = unique_counts[sorted_indices[::-1]]
     sorted_probs = sorted_counts / num_entries
     return -1 * np.sum(sorted_probs * np.log2(sorted_probs)), sorted_probs[0], 
+
+
+def empirical_entropy(x):
+    if len(x.shape) == 1:
+        return single_empirical_entropy(x)
+    assert len(x.shape) == 2
+    entropy = 0
+    for i in range(x.shape[1]):
+        entropy += single_empirical_entropy(x[: ,i])[0]
+
+    unique_values, unique_counts = np.unique(x, return_counts=True)
+    num_entries = np.sum(unique_counts)
+    sorted_indices = unique_counts.argsort()
+    sorted_counts = unique_counts[sorted_indices[::-1]]
+    return entropy, sorted_counts[0] / num_entries
 
 
 def get_data_metrics(keys, values):
@@ -53,20 +67,25 @@ def get_data_metrics(keys, values):
         keys_size_bytes = sum(len(key) for key in keys)
     else:
         raise ValueError("Invalid key type")
-    values_size_bytes = values.shape[0] * values.shape[1] * 4 # 4 bytes per int
+    if len(values.shape) == 2:
+        values_size_bytes = values.shape[0] * values.shape[1] * 4 # 4 bytes per int
+    else:
+        values_size_bytes = values.shape[0] * 4
     return {
+        "entropy_bits": entropy,
+        "total_size_mb": (keys_size_bytes + values_size_bytes) / 1e6,
+        "total_size_gb": (keys_size_bytes + values_size_bytes) / 1e9,
         "num_rows": values.shape[0],
-        "num_columns": values.shape[1],
+        "num_columns": values.shape[1] if len(values.shape) == 2 else 1,
         "most_common_prob": most_common_prob,
-        "keys_size_bytes": keys_size_bytes,
-        "values_size_bytes": values_size_bytes,
-        "total_size_bytes": keys_size_bytes + values_size_bytes,
-        "entropy_bits": entropy, # TODO check this 
+        "values_size_mb": values_size_bytes / 1e6,
+        "keys_size_mb": keys_size_bytes/ 1e6,
     }
 
 
 def construct_caramel(keys, values):
-    keys = [key.to_bytes(4, "little") for key in keys]
+    if not isinstance(keys[0], str):
+        keys = [key.to_bytes(4, "little") for key in keys]
     start = time.time()
     caramel = Caramel(keys, values, verbose=False)
     construction_time = time.time() - start
@@ -83,7 +102,12 @@ def construct_caramel(keys, values):
 
     savepath = "save.caramel"
     caramel.save(savepath)
-    caramel_size_bytes = os.stat(savepath).st_size
+    if os.path.isfile(savepath):
+        caramel_size_bytes = os.path.getsize(savepath)
+    else:
+        caramel_size_bytes = 0
+        for csf in os.scandir(savepath):
+            caramel_size_bytes += os.path.getsize(csf)
     os.system(f"rm -rf {savepath}")
 
     return {
@@ -113,4 +137,5 @@ if __name__ == "__main__":
     with open("benchmark_numbers.txt", "a") as f:
         f.write(f"{args.keys} | {args.values}\n")
         f.write(f"{data_metrics}\n")
-        f.write(f"{caramel_metrics}\n\n")
+        f.write(f"{caramel_metrics}\n")
+        f.write("\n")
