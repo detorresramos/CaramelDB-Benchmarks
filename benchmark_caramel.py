@@ -51,7 +51,6 @@ def empirical_entropy(x):
     entropy = 0
     for i in range(x.shape[1]):
         entropy += single_empirical_entropy(x[: ,i])[0]
-
     unique_values, unique_counts = np.unique(x, return_counts=True)
     num_entries = np.sum(unique_counts)
     sorted_indices = unique_counts.argsort()
