@@ -83,7 +83,7 @@ def get_data_metrics(keys, values):
     }
 
 
-def construct_caramel(keys, values):
+def construct_caramel(keys, values, savepath):
     if not isinstance(keys[0], str):
         keys = [key.to_bytes(4, "little") for key in keys]
     start = time.time()
@@ -100,7 +100,6 @@ def construct_caramel(keys, values):
         total_query_time += time.time() - start
     average_query_time = total_query_time / num_queries
 
-    savepath = "save.caramel"
     caramel.save(savepath)
     if os.path.isfile(savepath):
         caramel_size_bytes = os.path.getsize(savepath)
@@ -108,7 +107,6 @@ def construct_caramel(keys, values):
         caramel_size_bytes = 0
         for csf in os.scandir(savepath):
             caramel_size_bytes += os.path.getsize(csf)
-    os.system(f"rm -rf {savepath}")
 
     return {
         "caramel_size_bytes": caramel_size_bytes,
@@ -131,7 +129,7 @@ if __name__ == "__main__":
     data_metrics = get_data_metrics(keys, values)
     print("Data Metrics: ", data_metrics)
 
-    caramel_metrics = construct_caramel(keys, values)
+    caramel_metrics = construct_caramel(keys, values, savepath=args.values.split(".")[0] + ".csf")
     print("Caramel Metrics: ", caramel_metrics)
 
     with open("benchmark_numbers.txt", "a") as f:
