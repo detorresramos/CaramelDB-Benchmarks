@@ -1,6 +1,5 @@
 import os
 import time
-import carameldb
 from carameldb import Caramel
 import numpy as np
 import argparse
@@ -12,6 +11,7 @@ def parse_args():
     )
     parser.add_argument("--keys", type=str)
     parser.add_argument("--values", type=str)
+    parser.add_argument("--output_file", type=str, default="benchmark_numbers.txt")
 
     return parser.parse_args()
 
@@ -51,7 +51,6 @@ def empirical_entropy(x):
     entropy = 0
     for i in range(x.shape[1]):
         entropy += single_empirical_entropy(x[: ,i])[0]
-
     unique_values, unique_counts = np.unique(x, return_counts=True)
     num_entries = np.sum(unique_counts)
     sorted_indices = unique_counts.argsort()
@@ -89,8 +88,7 @@ def construct_caramel(keys, values, savepath):
     start = time.time()
     caramel = Caramel(keys, values, verbose=False)
     construction_time = time.time() - start
-
-    #TODO should we measure this query time in C++
+    
     total_query_time = 0
     num_queries = 1000
     for i in range(num_queries):
@@ -107,7 +105,6 @@ def construct_caramel(keys, values, savepath):
         caramel_size_bytes = 0
         for csf in os.scandir(savepath):
             caramel_size_bytes += os.path.getsize(csf)
-
     return {
         "caramel_size_bytes": caramel_size_bytes,
         "caramel_size_MB": caramel_size_bytes / 1e6,
@@ -126,13 +123,14 @@ if __name__ == "__main__":
 
     assert len(values) == len(keys)
 
-    data_metrics = get_data_metrics(keys, values)
+    # data_metrics = get_data_metrics(keys, values)
+    data_metrics = {}
     print("Data Metrics: ", data_metrics)
 
     caramel_metrics = construct_caramel(keys, values, savepath=args.values.split(".")[0] + ".csf")
     print("Caramel Metrics: ", caramel_metrics)
 
-    with open("benchmark_numbers.txt", "a") as f:
+    with open(args.output_file, "a") as f:
         f.write(f"{args.keys} | {args.values}\n")
         f.write(f"{data_metrics}\n")
         f.write(f"{caramel_metrics}\n")
