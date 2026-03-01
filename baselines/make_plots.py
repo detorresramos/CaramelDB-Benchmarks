@@ -61,7 +61,9 @@ def _get_memory_bytes(result):
     mem = result["memory"]
     if "theoretical" in mem:
         return mem["theoretical"]
-    return mem["serialized"]
+    if "serialized" in mem:
+        return mem["serialized"]
+    return mem["serialized_bytes"]
 
 
 def _get_inference_ns(result):

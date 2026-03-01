@@ -99,7 +99,6 @@ def plot_alpha_sweep(data, filter_label, ax=None):
     alphas = []
     lb_vals = []
     ub_vals = []
-    theory_guided = []
     best_empirical = []
 
     for r in data["results"]:
@@ -113,26 +112,17 @@ def plot_alpha_sweep(data, filter_label, ax=None):
         alphas.append(alpha)
         lb_vals.append(theory.lower_bound(alpha, eps, b_eps, n_over_N))
         ub_vals.append(theory.upper_bound(alpha, eps, b_eps, n_over_N))
-
-        emp_at_theory = next(
-            e["bpk_saved"] for e in r["empirical_per_param"] if e[pk] == best_param
-        )
-        theory_guided.append(emp_at_theory)
         best_empirical.append(r["best_empirical_bpk_saved"])
 
     ax.fill_between(alphas, lb_vals, ub_vals, alpha=0.2, color="blue")
     ax.plot(alphas, ub_vals, "b-", linewidth=1.5, label="Upper bound")
     ax.plot(alphas, lb_vals, "b--", linewidth=1.5, label="Lower bound")
     ax.plot(
-        alphas, theory_guided, "g.-", linewidth=1.5, markersize=4, label="Theory-guided"
-    )
-    ax.plot(
         alphas,
         best_empirical,
         "r.-",
         linewidth=1.5,
         markersize=4,
-        alpha=0.7,
         label="Best empirical",
     )
     ax.axhline(y=0, color="gray", linestyle="-", alpha=0.5, linewidth=1)

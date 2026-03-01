@@ -9,19 +9,19 @@
   "results": [
     {
       "method": "hash_table",
-      "construction_time_s": 0.007408749996102415,
+      "construction_time_s": 0.007334790992899798,
       "inference_ns": {
-        "mean": 390.39,
+        "mean": 388.74,
         "median": 375.0,
-        "std": 172.43792477294545,
-        "min": 42.0,
-        "max": 916.0,
-        "p95": 708.05,
-        "p99": 833.8300000000004
+        "std": 180.1083351763599,
+        "min": 41.0,
+        "max": 959.0,
+        "p95": 712.1999999999998,
+        "p99": 958.01
       },
       "memory": {
         "theoretical": 1188890,
-        "tracemalloc": 224
+        "tracemalloc": 656
       },
       "filter_params": null,
       "filter_type": null

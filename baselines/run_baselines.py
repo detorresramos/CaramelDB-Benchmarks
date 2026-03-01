@@ -21,7 +21,6 @@ import json
 import os
 import sys
 import time
-import tracemalloc
 
 import numpy as np
 
@@ -92,23 +91,13 @@ def measure_inference_time(method, structure, keys, seed):
     }
 
 
-def measure_tracemalloc(method, keys, values):
-    tracemalloc.start()
-    snap_before = tracemalloc.take_snapshot()
-    method.construct(keys, values)
-    snap_after = tracemalloc.take_snapshot()
-    tracemalloc.stop()
-    stats = snap_after.compare_to(snap_before, "lineno")
-    return sum(s.size_diff for s in stats if s.size_diff > 0)
-
-
 def _print_result_summary(result):
     inf = result["inference_ns"]
     mem = result["memory"]
-    if "tracemalloc" in mem:
-        memory_desc = f"tracemalloc={mem['tracemalloc']:,}B"
-    elif "serialized" in mem:
+    if "serialized" in mem:
         memory_desc = f"serialized={mem['serialized']:,}B"
+    elif "theoretical" in mem:
+        memory_desc = f"theoretical={mem['theoretical']:,}B"
     else:
         memory_desc = f"serialized={mem.get('serialized_bytes', 0):,}B"
     p99_str = f" (p99={inf['p99']:.0f})" if "p99" in inf else ""
@@ -135,7 +124,6 @@ def run_single_method(method, keys, values, seed):
     memory = method.measure_memory(keys, values)
     if memory is None and hasattr(method, "measure_memory_from_structure"):
         memory = method.measure_memory_from_structure(structure)
-    memory["tracemalloc"] = measure_tracemalloc(method, keys, values)
 
     inference_ns = measure_inference_time(method, structure, keys, seed)
 
