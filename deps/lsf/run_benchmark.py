@@ -212,7 +212,10 @@ def results_to_json(results, keys, values, competitor):
 
         entry = {
             "method": name,
-            "construction_time_s": r.get("construct_ms", 0) / 1000.0,
+            "construction_time_s": (
+                r.get("construct_ms", 0) / 1000.0
+                + r.get("training_seconds", 0)
+            ),
             "inference_ns": {
                 "mean": r.get("query_nanos", 0),
             },

@@ -215,9 +215,9 @@
     },
     {
       "method": "lsf_ours_filtered-huffman_opt",
-      "construction_time_s": 2.664431,
+      "construction_time_s": 13.284231165990832,
       "inference_ns": {
-        "mean": 13302
+        "mean": 13530
       },
       "memory": {
         "serialized": 19890,

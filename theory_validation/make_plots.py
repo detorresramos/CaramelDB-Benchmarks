@@ -16,6 +16,7 @@ FIGURES_DIR = os.path.join(_dir, "figures")
 DATA_DIR = os.path.join(FIGURES_DIR, "data")
 
 FILTER_LABELS = ["xor", "binary_fuse", "bloom_k1", "bloom_k2", "bloom_k3"]
+FILTER_LABELS_COMBINED = ["xor", "binary_fuse", "bloom_k1", "bloom_k3"]
 DISTRIBUTIONS = ["unique", "zipfian", "uniform_100"]
 EPSILON_SWEEP_ALPHAS = [0.7, 0.9]
 
@@ -186,9 +187,9 @@ def plot_alpha_sweep_individual(filter_label, dist):
 
 
 def plot_alpha_sweep_combined(dist):
-    fig, axes = plt.subplots(1, 5, figsize=(24, 4), sharey=True)
+    fig, axes = plt.subplots(1, len(FILTER_LABELS_COMBINED), figsize=(20, 4), sharey=True)
 
-    for i, fl in enumerate(FILTER_LABELS):
+    for i, fl in enumerate(FILTER_LABELS_COMBINED):
         path = os.path.join(DATA_DIR, f"alpha_sweep_{fl}_{dist}.json")
         data = load_json(path)
         if data is None:
@@ -318,9 +319,11 @@ def plot_epsilon_sweep_individual(filter_label, dist, alpha):
 
 
 def plot_epsilon_sweep_combined(dist, alpha):
-    fig, axes = plt.subplots(1, 5, figsize=(24, 5))
+    fig, axes = plt.subplots(
+        1, len(FILTER_LABELS_COMBINED), figsize=(20, 5),
+    )
 
-    for i, fl in enumerate(FILTER_LABELS):
+    for i, fl in enumerate(FILTER_LABELS_COMBINED):
         path = os.path.join(DATA_DIR, f"epsilon_sweep_{fl}_{dist}_alpha{alpha}.json")
         data = load_json(path)
         if data is None:
