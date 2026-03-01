@@ -271,7 +271,7 @@ def JavaMPH():
     return JavaBenchmark("java_mph", JAVA_MPH_JAR, "com.indeed.mph.Benchmark")
 
 
-# --- LSF (Docker-based) ---
+# --- LSF ---
 
 LSF_DIR = os.path.normpath(os.path.join(_dir, "..", "deps", "lsf"))
 sys.path.insert(0, os.path.join(_dir, ".."))
@@ -300,7 +300,7 @@ def _lsf_image_exists():
 
 
 class LSFBenchmark:
-    """Runs LSF benchmarks via Docker. Returns a list of result dicts."""
+    """Runs LSF benchmarks natively (preferred) or via Docker (fallback)."""
 
     def __init__(self, competitor="all", learned=False):
         self.competitor = competitor
@@ -309,24 +309,37 @@ class LSFBenchmark:
         self.name = f"lsf_{competitor.lower()}{suffix}"
 
     def run_full_benchmark(self, keys, values, seed):
-        if not _docker_available():
-            warnings.warn("Docker not available, skipping LSF benchmark")
-            return None
-        if not _lsf_image_exists():
+        from deps.lsf.run_benchmark import (
+            _native_bench_available,
+            results_to_json,
+            run_lsf_docker,
+            run_lsf_native,
+        )
+
+        if _native_bench_available():
+            raw = run_lsf_native(
+                keys, values,
+                competitor=self.competitor,
+                seed=seed,
+                learned=self.learned,
+            )
+        elif _docker_available() and _lsf_image_exists():
+            raw = run_lsf_docker(
+                keys, values,
+                competitor=self.competitor,
+                seed=seed,
+                learned=self.learned,
+            )
+        else:
             warnings.warn(
-                "caramel-lsf Docker image not found. "
-                "Run deps/lsf/build_docker.sh first."
+                "LSF benchmark not available: native binary not built "
+                "and Docker image not found. Build with: "
+                "cd deps/LearnedStaticFunction && mkdir build && cd build "
+                "&& cmake .. -DCMAKE_BUILD_TYPE=Release -DTFLITE_ENABLE_XNNPACK=OFF "
+                "&& cmake --build . --target ribbon_learned_bench"
             )
             return None
 
-        from deps.lsf.run_benchmark import results_to_json, run_lsf_docker
-
-        raw = run_lsf_docker(
-            keys, values,
-            competitor=self.competitor,
-            seed=seed,
-            learned=self.learned,
-        )
         if raw is None:
             return None
         return results_to_json(raw, keys, values, self.competitor)

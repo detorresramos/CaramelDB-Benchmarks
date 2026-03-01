@@ -98,6 +98,8 @@ def plot_alpha_sweep(data, filter_label, ax=None):
 
     alphas = []
     lb_vals = []
+    ub_at_lb_eps = []
+    ub_at_emp_eps = []
     best_empirical = []
 
     for r in data["results"]:
@@ -108,10 +110,23 @@ def plot_alpha_sweep(data, filter_label, ax=None):
         best_param, _ = compute_theory_best(filter_label, alpha, n_over_N, n_filter)
         b_eps, eps = compute_params(filter_label, best_param, n_filter)
 
+        best_emp_param = r["best_empirical_params"][pk]
+        b_eps_emp, eps_emp = compute_params(filter_label, best_emp_param, n_filter)
+
         alphas.append(alpha)
         lb_vals.append(theory.lower_bound(alpha, eps, b_eps, n_over_N))
+        ub_at_lb_eps.append(theory.upper_bound(alpha, eps, b_eps, n_over_N))
+        ub_at_emp_eps.append(theory.upper_bound(alpha, eps_emp, b_eps_emp, n_over_N))
         best_empirical.append(r["best_empirical_bpk_saved"])
 
+    ax.plot(
+        alphas, ub_at_lb_eps, "b-", linewidth=1, alpha=0.7,
+        label=r"UB at $\varepsilon_{\mathrm{LB}}$",
+    )
+    ax.plot(
+        alphas, ub_at_emp_eps, "b-", linewidth=1.5,
+        label=r"UB at $\varepsilon_{\mathrm{emp}}$",
+    )
     ax.plot(alphas, lb_vals, "b--", linewidth=1.5, label="Lower bound")
     ax.plot(
         alphas,
@@ -193,7 +208,7 @@ def plot_alpha_sweep_combined(dist):
     print(f"  Saved: {out}")
 
 
-def plot_epsilon_sweep(data, filter_label, ax=None):
+def plot_epsilon_sweep(data, filter_label, ax=None, show_legend=True):
     if ax is None:
         fig, ax = plt.subplots(figsize=(8, 5))
     else:
@@ -230,6 +245,7 @@ def plot_epsilon_sweep(data, filter_label, ax=None):
     )
     ax.axhline(y=0, color="gray", linestyle="-", alpha=0.5, linewidth=1)
 
+    # Theory optimal vertical line
     best_param, _ = compute_theory_best(filter_label, alpha, n_over_N, n_filter)
     _, eps_theory = compute_params(filter_label, best_param, n_filter)
     ax.axvline(
@@ -241,6 +257,7 @@ def plot_epsilon_sweep(data, filter_label, ax=None):
         label=f"Theory opt ({pk}={best_param})",
     )
 
+    # Empirical optimal vertical line
     best_idx = int(np.argmax(bpk_saved))
     best_emp_param = param_vals[best_idx]
     if best_emp_param != best_param:
@@ -270,7 +287,8 @@ def plot_epsilon_sweep(data, filter_label, ax=None):
         f"($\\alpha$={alpha})",
         fontsize=11,
     )
-    ax.legend(fontsize=8, loc="best")
+    if show_legend:
+        ax.legend(fontsize=7, loc="lower left", framealpha=0.9, edgecolor="gray")
     ax.grid(True, alpha=0.3)
 
     return fig, ax
@@ -309,9 +327,26 @@ def plot_epsilon_sweep_combined(dist, alpha):
         if data is None:
             axes[i].set_visible(False)
             continue
-        plot_epsilon_sweep(data, fl, axes[i])
+        plot_epsilon_sweep(data, fl, axes[i], show_legend=False)
         if i > 0:
             axes[i].set_ylabel("")
+
+    # Shared legend: collect common entries from first visible subplot
+    # (skip per-subplot entries like "Theory opt (fp=X)" which differ)
+    common_labels = {"Upper bound", "Lower bound", "Empirical"}
+    handles, labels = [], []
+    for ax_i in axes:
+        if not ax_i.get_visible():
+            continue
+        for h, l in zip(*ax_i.get_legend_handles_labels()):
+            if l in common_labels and l not in labels:
+                handles.append(h)
+                labels.append(l)
+        break
+    fig.legend(
+        handles, labels, loc="upper center", bbox_to_anchor=(0.5, -0.01),
+        ncol=len(labels), fontsize=9, framealpha=0.9,
+    )
 
     fig.suptitle(
         f"Epsilon Sweep — {DIST_DISPLAY[dist]} ($\\alpha$={alpha})",

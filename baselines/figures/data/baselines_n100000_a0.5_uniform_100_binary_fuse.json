@@ -236,6 +236,24 @@
         "cross_entropy_bits_per_key": null
       },
       "filter_type": null
+    },
+    {
+      "method": "lsf_ours_filtered-huffman_opt",
+      "construction_time_s": 1.276218,
+      "inference_ns": {
+        "mean": 6129
+      },
+      "memory": {
+        "serialized": 55418,
+        "bits_per_key": 4.38504,
+        "model_bits_per_key": 0.04848
+      },
+      "filter_params": {
+        "competitor": "ours",
+        "storage": "Filtered-Huffman_Opt",
+        "cross_entropy_bits_per_key": 4.32065
+      },
+      "filter_type": null
     }
   ]
 }

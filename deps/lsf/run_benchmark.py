@@ -1,10 +1,10 @@
-"""Run LSF benchmarks via Docker on CaramelDB-format data.
+"""Run LSF benchmarks on CaramelDB-format data.
 
 Usage:
     python deps/lsf/run_benchmark.py keys.txt values.bin [--competitor CSF|BuRR|all|LSF]
 
 Converts data to .lrbin, optionally trains models, runs ribbon_learned_bench
-in Docker, returns JSON.
+natively (preferred) or via Docker (fallback), returns JSON.
 """
 
 import json
@@ -22,6 +22,9 @@ from lsf.convert_to_lrbin import write_lrbin
 
 DOCKER_IMAGE = "caramel-lsf"
 DATASET_NAME = "caramel"
+
+_LSF_BUILD_DIR = os.path.normpath(os.path.join(_dir, "..", "LearnedStaticFunction", "build"))
+_NATIVE_BENCH_BIN = os.path.join(_LSF_BUILD_DIR, "ribbon_learned_bench")
 
 
 def parse_result_line(line):
@@ -64,8 +67,70 @@ def _train_models_locally(data_dir, dataset_name):
     return True
 
 
+def _native_bench_available():
+    return os.path.isfile(_NATIVE_BENCH_BIN)
+
+
+def run_lsf_native(keys, values, competitor="all", seed=42, learned=False):
+    """Run LSF benchmark natively (no Docker).
+
+    Args:
+        keys: list of string keys
+        values: numpy array of uint32 values
+        competitor: "CSF", "BuRR", "LSF", or "all"
+        seed: random seed
+        learned: if True, train models locally first
+
+    Returns list of parsed result dicts, one per competitor/storage combo.
+    """
+    with tempfile.TemporaryDirectory(prefix="lsf_bench_") as tmpdir:
+        data_dir = os.path.join(tmpdir, "data")
+        os.makedirs(data_dir)
+
+        output_prefix = os.path.join(data_dir, DATASET_NAME)
+        write_lrbin(keys, values, output_prefix)
+
+        if learned:
+            if not _train_models_locally(data_dir, DATASET_NAME):
+                return None
+
+        env = os.environ.copy()
+        env["DYLD_LIBRARY_PATH"] = _LSF_BUILD_DIR + ":" + env.get("DYLD_LIBRARY_PATH", "")
+
+        cmd = [
+            _NATIVE_BENCH_BIN,
+            "-r", data_dir + "/",
+            "-d", DATASET_NAME,
+            "-c", competitor,
+            "-s", "filter_huf",  # only the canonical Filtered-Huffman_Opt variant
+        ]
+
+        timeout = 3600 if learned else 600
+        try:
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=timeout, env=env
+            )
+        except subprocess.TimeoutExpired:
+            sys.stderr.write(f"LSF benchmark timed out after {timeout}s\n")
+            return None
+
+        if result.returncode != 0:
+            sys.stderr.write(f"LSF benchmark failed (rc={result.returncode}):\n{result.stderr}\n")
+            if result.stdout:
+                sys.stderr.write(f"stdout:\n{result.stdout}\n")
+            return None
+
+        results = []
+        for line in result.stdout.splitlines():
+            parsed = parse_result_line(line)
+            if parsed:
+                results.append(parsed)
+
+        return results
+
+
 def run_lsf_docker(keys, values, competitor="all", seed=42, learned=False):
-    """Run LSF benchmark via Docker.
+    """Run LSF benchmark via Docker (fallback).
 
     Args:
         keys: list of string keys
@@ -193,7 +258,10 @@ def main():
         open(args.values_path, "rb").read(), dtype=np.dtype(">u8")
     ).astype(np.uint32)
 
-    results = run_lsf_docker(keys, values, args.competitor, learned=args.learned)
+    if _native_bench_available():
+        results = run_lsf_native(keys, values, args.competitor, learned=args.learned)
+    else:
+        results = run_lsf_docker(keys, values, args.competitor, learned=args.learned)
     if results:
         converted = results_to_json(results, keys, values, args.competitor)
         print(json.dumps(converted, indent=2))
