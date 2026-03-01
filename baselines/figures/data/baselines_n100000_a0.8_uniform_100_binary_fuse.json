@@ -9,67 +9,67 @@
   "results": [
     {
       "method": "hash_table",
-      "construction_time_s": 0.0068868750022375025,
+      "construction_time_s": 0.0067593339990708046,
       "inference_ns": {
-        "mean": 405.0,
-        "median": 375.0,
-        "std": 176.07805087517298,
-        "min": 41.0,
-        "max": 917.0,
-        "p95": 752.0999999999999,
-        "p99": 834.8300000000004
+        "mean": 629.65,
+        "median": 417.0,
+        "std": 718.2440445280421,
+        "min": 42.0,
+        "max": 7042.0,
+        "p95": 1125.0,
+        "p99": 1762.3300000000272
       },
       "memory": {
         "theoretical": 1188890,
-        "tracemalloc": 168
+        "tracemalloc": 656
       },
       "filter_params": null,
       "filter_type": null
     },
     {
       "method": "cpp_hash_table",
-      "construction_time_s": 0.011673624998365995,
+      "construction_time_s": 0.013325042003998533,
       "inference_ns": {
-        "mean": 481.67,
-        "median": 500.0,
-        "std": 127.04660995083653,
+        "mean": 555.46,
+        "median": 458.0,
+        "std": 315.8388962746672,
         "min": 166.0,
-        "max": 1000.0,
-        "p95": 667.0,
-        "p99": 670.3300000000017
+        "max": 2042.0,
+        "p95": 1131.2499999999995,
+        "p99": 1794.5000000000014
       },
       "memory": {
         "theoretical": 1188890,
-        "tracemalloc": 168
+        "tracemalloc": 624
       },
       "filter_params": null,
       "filter_type": null
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.029368791001616046,
+      "construction_time_s": 0.02675016700231936,
       "inference_ns": {
-        "mean": 270.94,
-        "median": 209.0,
-        "std": 277.26701282337933,
+        "mean": 255.45,
+        "median": 208.0,
+        "std": 266.37805371313914,
         "min": 166.0,
-        "max": 2875.0,
-        "p95": 458.05,
-        "p99": 729.6700000000111
+        "max": 2834.0,
+        "p95": 375.0,
+        "p99": 482.75000000001216
       },
       "memory": {
-        "serialized": 31312,
+        "serialized": 31337,
         "csf_stats": {
-          "in_memory_bytes": 31132,
-          "solution_bytes": 26688.0,
+          "in_memory_bytes": 31157,
+          "solution_bytes": 26696.0,
           "filter_bytes": 2976.0,
-          "metadata_bytes": 1468.0,
+          "metadata_bytes": 1485.0,
           "bucket_stats": {
-            "num_buckets": 60,
-            "total_solution_bits": 211673,
-            "avg_solution_bits": 3527.883333333333,
-            "min_solution_bits": 3074,
-            "max_solution_bits": 3892
+            "num_buckets": 61,
+            "total_solution_bits": 211718,
+            "avg_solution_bits": 3470.7868852459014,
+            "min_solution_bits": 2930,
+            "max_solution_bits": 3855
           },
           "huffman_stats": {
             "num_unique_symbols": 101,
@@ -96,7 +96,7 @@
             "fingerprint_bits": 1
           }
         },
-        "tracemalloc": 856
+        "tracemalloc": 1280
       },
       "filter_params": {
         "fingerprint_bits": 1
@@ -105,15 +105,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.027682667001499794,
+      "construction_time_s": 0.026944290999381337,
       "inference_ns": {
-        "mean": 296.32,
-        "median": 250.0,
-        "std": 303.632701796101,
-        "min": 208.0,
-        "max": 3208.0,
-        "p95": 459.0,
-        "p99": 609.2500000000134
+        "mean": 249.66,
+        "median": 209.0,
+        "std": 82.16802541134842,
+        "min": 167.0,
+        "max": 667.0,
+        "p95": 416.05,
+        "p99": 583.8400000000004
       },
       "memory": {
         "serialized": 34090,
@@ -154,7 +154,7 @@
             "fingerprint_bits": null
           }
         },
-        "tracemalloc": 784
+        "tracemalloc": 1160
       },
       "filter_params": {
         "bloom_bits_per_element": 4,
@@ -164,15 +164,15 @@
     },
     {
       "method": "java_csf",
-      "construction_time_s": 0.179606,
+      "construction_time_s": 0.183748,
       "inference_ns": {
-        "mean": 330.0,
+        "mean": 337.0,
         "median": 333.0,
-        "std": 94.0,
+        "std": 121.0,
         "min": 291,
-        "max": 1208,
-        "p95": 375.0,
-        "p99": 466.0
+        "max": 1417,
+        "p95": 419.0,
+        "p99": 716.0
       },
       "memory": {
         "num_bits": 271087,
@@ -185,20 +185,128 @@
     },
     {
       "method": "java_mph",
-      "construction_time_s": 0.42013,
+      "construction_time_s": 0.437543,
       "inference_ns": {
-        "mean": 1102.0,
-        "median": 959.0,
-        "std": 742.0,
-        "min": 667,
-        "max": 7625,
-        "p95": 1739.0,
-        "p99": 2799.0
+        "mean": 1505.0,
+        "median": 1355.0,
+        "std": 964.0,
+        "min": 750,
+        "max": 7750,
+        "p95": 2631.0,
+        "p99": 6389.0
       },
       "memory": {
         "serialized_bytes": 612592
       },
       "filter_params": null,
+      "filter_type": null
+    },
+    {
+      "method": "lsf_burr_burr",
+      "construction_time_s": 0.009049125,
+      "inference_ns": {
+        "mean": 18.504688
+      },
+      "memory": {
+        "serialized_bytes": 88591,
+        "bits_per_key": 7.08728,
+        "model_bits_per_key": 0
+      },
+      "filter_params": {
+        "competitor": "BuRR",
+        "storage": "BuRR",
+        "cross_entropy_bits_per_key": null
+      },
+      "filter_type": null
+    },
+    {
+      "method": "lsf_ourcsf_filtered-huffmancsf_opt",
+      "construction_time_s": 0.044674626,
+      "inference_ns": {
+        "mean": 46.740595
+      },
+      "memory": {
+        "serialized_bytes": 32227,
+        "bits_per_key": 2.57816,
+        "model_bits_per_key": 0.03232
+      },
+      "filter_params": {
+        "competitor": "ourCSF",
+        "storage": "Filtered-HuffmanCSF_Opt",
+        "cross_entropy_bits_per_key": null
+      },
+      "filter_type": null
+    },
+    {
+      "method": "lsf_ours_filtered-huffman_opt",
+      "construction_time_s": 1.686330667,
+      "inference_ns": {
+        "mean": 8330.956726
+      },
+      "memory": {
+        "serialized_bytes": 27189,
+        "bits_per_key": 2.1752,
+        "model_bits_per_key": 0.04848
+      },
+      "filter_params": {
+        "competitor": "ours",
+        "storage": "Filtered-Huffman_Opt",
+        "cross_entropy_bits_per_key": 2.049253
+      },
+      "filter_type": null
+    },
+    {
+      "method": "lsf_ours_filtered-fano_opt",
+      "construction_time_s": 0.321719583,
+      "inference_ns": {
+        "mean": 1462.311908
+      },
+      "memory": {
+        "serialized_bytes": 27588,
+        "bits_per_key": 2.20704,
+        "model_bits_per_key": 0.04848
+      },
+      "filter_params": {
+        "competitor": "ours",
+        "storage": "Filtered-Fano_Opt",
+        "cross_entropy_bits_per_key": 2.049253
+      },
+      "filter_type": null
+    },
+    {
+      "method": "lsf_ours_filtered-fano50_opt",
+      "construction_time_s": 0.16821854200000003,
+      "inference_ns": {
+        "mean": 764.838377
+      },
+      "memory": {
+        "serialized_bytes": 27588,
+        "bits_per_key": 2.20704,
+        "model_bits_per_key": 0.04848
+      },
+      "filter_params": {
+        "competitor": "ours",
+        "storage": "Filtered-Fano50_Opt",
+        "cross_entropy_bits_per_key": 2.049253
+      },
+      "filter_type": null
+    },
+    {
+      "method": "lsf_ours_filtered-fano50_root_opt",
+      "construction_time_s": 0.168379708,
+      "inference_ns": {
+        "mean": 753.150297
+      },
+      "memory": {
+        "serialized_bytes": 27505,
+        "bits_per_key": 2.2004,
+        "model_bits_per_key": 0.04848
+      },
+      "filter_params": {
+        "competitor": "ours",
+        "storage": "Filtered-Fano50_Root_Opt",
+        "cross_entropy_bits_per_key": 2.049253
+      },
       "filter_type": null
     }
   ]

@@ -26,7 +26,15 @@ from shared.data_gen import (
     gen_alpha_values,
     gen_keys,
 )
-from baselines.methods import CppHashTable, CSFFilter, HashTable, JavaCSF, JavaMPH
+from baselines.methods import (
+    CppHashTable,
+    CSFFilter,
+    HashTable,
+    JavaCSF,
+    JavaMPH,
+    LSFAll,
+    LSFLearned,
+)
 
 FIGURES_DIR = os.path.join(_dir, "figures")
 DATA_DIR = os.path.join(FIGURES_DIR, "data")
@@ -37,7 +45,7 @@ NUM_INFERENCE_QUERIES = 100
 
 SWEEP_NS = [100_000, 1_000_000, 10_000_000]
 SWEEP_ALPHAS = [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99]
-SWEEP_DISTS = ["unique", "zipfian", "uniform_100"]
+SWEEP_DISTS = ["uniform_100", "zipfian", "unique"]
 
 
 def measure_inference_time(method, structure, keys, seed):
@@ -82,11 +90,14 @@ def _print_result_summary(result):
     mem = result["memory"]
     if "tracemalloc" in mem:
         memory_desc = f"tracemalloc={mem['tracemalloc']:,}B"
+    elif "serialized" in mem:
+        memory_desc = f"serialized={mem['serialized']:,}B"
     else:
         memory_desc = f"serialized={mem.get('serialized_bytes', 0):,}B"
+    p99_str = f" (p99={inf['p99']:.0f})" if "p99" in inf else ""
     print(
         f"    construction={result['construction_time_s']:.3f}s  "
-        f"inference={inf['mean']:.0f}ns (p99={inf['p99']:.0f})  "
+        f"inference={inf['mean']:.0f}ns{p99_str}  "
         f"{memory_desc}"
     )
 
@@ -161,6 +172,40 @@ def run_experiment(n, alpha, minority_dist, seed, filter_type, keys=None, values
         result["filter_type"] = None
         results.append(result)
         _print_result_summary(result)
+
+    lsf_method = LSFAll()
+    print(f"  Running {lsf_method.name} (Docker)...")
+    lsf_results = lsf_method.run_full_benchmark(keys, values, seed)
+    if lsf_results is None:
+        print("    Skipped (Docker not available or image not built)")
+    else:
+        for r in lsf_results:
+            r["filter_type"] = None
+            results.append(r)
+            _print_result_summary(r)
+
+    lsf_learned = LSFLearned()
+    num_classes = len(np.unique(values))
+    if num_classes <= 500:
+        est = "~2-5min"
+    elif num_classes <= 5000:
+        est = "~10-30min"
+    elif num_classes <= 20000:
+        est = "~30-60min, may timeout"
+    else:
+        est = "likely timeout under QEMU"
+    print(f"  Running {lsf_learned.name} ({num_classes} classes, est {est})...", flush=True)
+    learned_t0 = time.perf_counter()
+    lsf_learned_results = lsf_learned.run_full_benchmark(keys, values, seed)
+    learned_elapsed = time.perf_counter() - learned_t0
+    if lsf_learned_results is None:
+        print(f"    Skipped after {learned_elapsed:.0f}s (Docker not available or training failed)", flush=True)
+    else:
+        print(f"    Learned LSF completed in {learned_elapsed:.0f}s", flush=True)
+        for r in lsf_learned_results:
+            r["filter_type"] = None
+            results.append(r)
+            _print_result_summary(r)
 
     return {
         "dataset": {
@@ -249,19 +294,54 @@ def main():
     alphas = args.alpha if args.alpha is not None else SWEEP_ALPHAS
     dists = args.minority_dist if args.minority_dist is not None else SWEEP_DISTS
 
+    configs = [(dist, n, alpha) for dist in dists for n in ns for alpha in alphas]
+    total = len(configs)
+    elapsed_times = []
+
+    # Rough time estimates based on observed Docker/QEMU performance:
+    # - uniform_100/zipfian: ~2-5min per config (few classes, fast TFLite)
+    # - unique: ~5min (high alpha, few classes) to 60min timeout (low alpha, 50K classes)
+    n_unique = sum(1 for d, _, _ in configs if d == "unique")
+    n_other = total - n_unique
+    est_min = n_other * 2 + n_unique * 5
+    est_max = n_other * 5 + n_unique * 60
+    print(
+        f"Sweep: {total} configs ({n_other} uniform/zipfian, {n_unique} unique). "
+        f"Estimated {est_min // 60}h{est_min % 60:02d}m - {est_max // 60}h{est_max % 60:02d}m total.",
+        flush=True,
+    )
+
     all_results = []
-    for dist in dists:
-        for n in ns:
-            for alpha in alphas:
-                print(
-                    f"\n=== alpha={alpha}, dist={dist}, n={n:,}, filter={args.filter_type} ==="
-                )
+    for idx, (dist, n, alpha) in enumerate(configs, 1):
+        eta_str = ""
+        if elapsed_times:
+            avg = sum(elapsed_times) / len(elapsed_times)
+            remaining = avg * (total - idx + 1)
+            if remaining >= 3600:
+                eta_str = f" | ETA: {remaining / 3600:.1f}h"
+            else:
+                eta_str = f" | ETA: {remaining / 60:.0f}m"
 
-                data = run_experiment(n, alpha, dist, args.seed, args.filter_type)
-                all_results.append(data)
+        print(
+            f"\n=== [{idx}/{total}] alpha={alpha}, dist={dist}, n={n:,}, "
+            f"filter={args.filter_type}{eta_str} ===",
+            flush=True,
+        )
 
-                filename = f"baselines_n{n}_a{alpha}_{dist}_{args.filter_type}.json"
-                save_json(data, os.path.join(DATA_DIR, filename))
+        config_t0 = time.perf_counter()
+        data = run_experiment(n, alpha, dist, args.seed, args.filter_type)
+        config_elapsed = time.perf_counter() - config_t0
+        elapsed_times.append(config_elapsed)
+
+        if config_elapsed >= 60:
+            print(f"  Config took {config_elapsed / 60:.1f}m", flush=True)
+        else:
+            print(f"  Config took {config_elapsed:.1f}s", flush=True)
+
+        all_results.append(data)
+
+        filename = f"baselines_n{n}_a{alpha}_{dist}_{args.filter_type}.json"
+        save_json(data, os.path.join(DATA_DIR, filename))
 
     combined = {
         "filter_type": args.filter_type,

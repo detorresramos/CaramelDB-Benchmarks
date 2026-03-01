@@ -6,3 +6,6 @@ dist/
 build/
 .DS_Store
 
+# Raw experiment data (regenerate with run scripts)
+*/figures/data/
+

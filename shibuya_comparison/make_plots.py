@@ -117,7 +117,7 @@ def plot_bits_per_key(results):
             "-",
             color="tab:blue",
             linewidth=2,
-            label="Ours",
+            label="AutoCSF",
         )
         ax.plot(
             alphas,
@@ -125,14 +125,14 @@ def plot_bits_per_key(results):
             "--",
             color="tab:orange",
             linewidth=2,
-            label="Shibuya",
+            label="Heuristic",
         )
         ax.set_xlabel(r"$\alpha$")
         ax.set_title(DIST_LABELS[dist])
+        ax.legend(loc="best")
         ax.grid(True, alpha=0.3)
 
     axes[0].set_ylabel("Bits per key")
-    axes[-1].legend(loc="best")
     fig.suptitle(
         f"Measured bits/key: Bloom filter recommendation comparison (N={N:,})",
         fontsize=14,
@@ -155,7 +155,7 @@ def plot_bits_per_key_saved(results):
             "-",
             color="tab:blue",
             linewidth=2,
-            label="Ours",
+            label="AutoCSF",
         )
         ax.plot(
             alphas,
@@ -163,15 +163,15 @@ def plot_bits_per_key_saved(results):
             "--",
             color="tab:orange",
             linewidth=2,
-            label="Shibuya",
+            label="Heuristic",
         )
         ax.axhline(0, color="black", linewidth=0.5, linestyle=":")
         ax.set_xlabel(r"$\alpha$")
         ax.set_title(DIST_LABELS[dist])
+        ax.legend(loc="best")
         ax.grid(True, alpha=0.3)
 
     axes[0].set_ylabel("Bits/key saved vs no filter")
-    axes[-1].legend(loc="best")
     fig.suptitle(
         f"Measured bits/key saved: Bloom filter recommendation comparison (N={N:,})",
         fontsize=14,

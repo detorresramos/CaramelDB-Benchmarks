@@ -269,3 +269,75 @@ def JavaCSF():
 
 def JavaMPH():
     return JavaBenchmark("java_mph", JAVA_MPH_JAR, "com.indeed.mph.Benchmark")
+
+
+# --- LSF (Docker-based) ---
+
+LSF_DIR = os.path.normpath(os.path.join(_dir, "..", "deps", "lsf"))
+sys.path.insert(0, os.path.join(_dir, ".."))
+
+
+def _docker_available():
+    try:
+        result = subprocess.run(
+            ["docker", "info"], capture_output=True, timeout=10
+        )
+        return result.returncode == 0
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+
+
+def _lsf_image_exists():
+    try:
+        result = subprocess.run(
+            ["docker", "image", "inspect", "caramel-lsf"],
+            capture_output=True,
+            timeout=10,
+        )
+        return result.returncode == 0
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+
+
+class LSFBenchmark:
+    """Runs LSF benchmarks via Docker. Returns a list of result dicts."""
+
+    def __init__(self, competitor="all", learned=False):
+        self.competitor = competitor
+        self.learned = learned
+        suffix = "_learned" if learned else ""
+        self.name = f"lsf_{competitor.lower()}{suffix}"
+
+    def run_full_benchmark(self, keys, values, seed):
+        if not _docker_available():
+            warnings.warn("Docker not available, skipping LSF benchmark")
+            return None
+        if not _lsf_image_exists():
+            warnings.warn(
+                "caramel-lsf Docker image not found. "
+                "Run deps/lsf/build_docker.sh first."
+            )
+            return None
+
+        from deps.lsf.run_benchmark import results_to_json, run_lsf_docker
+
+        raw = run_lsf_docker(
+            keys, values,
+            competitor=self.competitor,
+            seed=seed,
+            learned=self.learned,
+        )
+        if raw is None:
+            return None
+        return results_to_json(raw, keys, values, self.competitor)
+
+    def get_params(self):
+        return {"competitor": self.competitor, "learned": self.learned}
+
+
+def LSFAll():
+    return LSFBenchmark("all", learned=False)
+
+
+def LSFLearned():
+    return LSFBenchmark("LSF", learned=True)

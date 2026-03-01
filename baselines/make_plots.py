@@ -28,7 +28,11 @@ METHOD_DISPLAY = {
     "csf_filter_shibuya_bloom": "CSF+Bloom (Shibuya)",
     "java_csf": "Java CSF (Sux4J)",
     "java_mph": "Java MPH Table",
+    "lsf_ourcsf_filtered-huffmancsf_opt": "LSF CSF",
+    "lsf_burr_burr": "LSF BuRR",
+    "lsf_ours_filtered-huffman_opt": "LSF Learned",
 }
+
 
 METHOD_MARKERS = {
     "cpp_hash_table": "D",
@@ -36,6 +40,9 @@ METHOD_MARKERS = {
     "csf_filter_shibuya": "^",
     "java_csf": "s",
     "java_mph": "P",
+    "lsf_ourcsf": "X",
+    "lsf_burr": "v",
+    "lsf_ours_filtered-huffman_opt": "d",
 }
 
 METHOD_COLORS = {
@@ -44,6 +51,9 @@ METHOD_COLORS = {
     "csf_filter_shibuya": "tab:orange",
     "java_csf": "tab:green",
     "java_mph": "tab:purple",
+    "lsf_ourcsf": "tab:brown",
+    "lsf_burr": "tab:pink",
+    "lsf_ours_filtered-huffman_opt": "tab:olive",
 }
 
 
@@ -56,9 +66,7 @@ def _get_memory_bytes(result):
     mem = result["memory"]
     if "theoretical" in mem:
         return mem["theoretical"]
-    if "serialized" in mem:
-        return mem["serialized"]
-    return mem["serialized_bytes"]
+    return mem["serialized"]
 
 
 def _get_inference_ns(result):

@@ -9,15 +9,15 @@
   "results": [
     {
       "method": "hash_table",
-      "construction_time_s": 0.007217874997877516,
+      "construction_time_s": 0.008832040999550372,
       "inference_ns": {
-        "mean": 397.47,
-        "median": 375.0,
-        "std": 178.94666551796934,
-        "min": 41.0,
-        "max": 1000.0,
-        "p95": 711.0499999999998,
-        "p99": 876.2500000000007
+        "mean": 436.3,
+        "median": 417.0,
+        "std": 176.15053221605663,
+        "min": 83.0,
+        "max": 1167.0,
+        "p95": 669.0499999999998,
+        "p99": 877.9200000000014
       },
       "memory": {
         "theoretical": 1188890,
@@ -28,15 +28,15 @@
     },
     {
       "method": "cpp_hash_table",
-      "construction_time_s": 0.011353583002346568,
+      "construction_time_s": 0.012798499999917112,
       "inference_ns": {
-        "mean": 470.46,
-        "median": 459.0,
-        "std": 133.414198644672,
-        "min": 166.0,
-        "max": 958.0,
-        "p95": 667.0,
-        "p99": 752.0800000000011
+        "mean": 560.85,
+        "median": 500.0,
+        "std": 272.93249623304297,
+        "min": 167.0,
+        "max": 1708.0,
+        "p95": 1166.05,
+        "p99": 1584.2500000000007
       },
       "memory": {
         "theoretical": 1188890,
@@ -47,29 +47,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.014886208999087103,
+      "construction_time_s": 0.01749091600504471,
       "inference_ns": {
-        "mean": 179.19,
+        "mean": 180.05,
         "median": 167.0,
-        "std": 45.1020387565795,
+        "std": 68.94002828545983,
         "min": 125.0,
-        "max": 459.0,
-        "p95": 252.0499999999999,
-        "p99": 375.84000000000043
+        "max": 625.0,
+        "p95": 333.0,
+        "p99": 460.6600000000009
       },
       "memory": {
-        "serialized": 9859,
+        "serialized": 9908,
         "csf_stats": {
-          "in_memory_bytes": 9679,
-          "solution_bytes": 4552.0,
+          "in_memory_bytes": 9728,
+          "solution_bytes": 4584.0,
           "filter_bytes": 3136.0,
-          "metadata_bytes": 1991.0,
+          "metadata_bytes": 2008.0,
           "bucket_stats": {
-            "num_buckets": 11,
-            "total_solution_bits": 35980,
-            "avg_solution_bits": 3270.909090909091,
-            "min_solution_bits": 2967,
-            "max_solution_bits": 3721
+            "num_buckets": 12,
+            "total_solution_bits": 36221,
+            "avg_solution_bits": 3018.4166666666665,
+            "min_solution_bits": 2772,
+            "max_solution_bits": 3303
           },
           "huffman_stats": {
             "num_unique_symbols": 434,
@@ -111,15 +111,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.01858583300054306,
+      "construction_time_s": 0.019109208005829714,
       "inference_ns": {
-        "mean": 230.07,
+        "mean": 228.77,
         "median": 209.0,
-        "std": 55.12535804872382,
+        "std": 50.5155134587386,
         "min": 167.0,
         "max": 542.0,
-        "p95": 333.05,
-        "p99": 500.4200000000002
+        "p95": 333.0,
+        "p99": 418.2500000000006
       },
       "memory": {
         "serialized": 10346,
@@ -176,18 +176,18 @@
     },
     {
       "method": "java_csf",
-      "construction_time_s": 0.14983,
+      "construction_time_s": 0.16914,
       "inference_ns": {
-        "mean": 288.0,
-        "median": 291.0,
-        "std": 63.0,
-        "min": 250,
-        "max": 833,
-        "p95": 336.0,
-        "p99": 421.0
+        "mean": 333.0,
+        "median": 333.0,
+        "std": 41.0,
+        "min": 291,
+        "max": 541,
+        "p95": 375.0,
+        "p99": 500.0
       },
       "memory": {
-        "num_bits": 171534,
+        "num_bits": 171531,
         "serialized_bytes": 22419
       },
       "filter_params": {
@@ -197,15 +197,15 @@
     },
     {
       "method": "java_mph",
-      "construction_time_s": 0.443314,
+      "construction_time_s": 0.470178,
       "inference_ns": {
-        "mean": 1692.0,
-        "median": 1479.0,
-        "std": 1251.0,
-        "min": 875,
-        "max": 10167,
-        "p95": 2766.0,
-        "p99": 7692.0
+        "mean": 1323.0,
+        "median": 1167.0,
+        "std": 728.0,
+        "min": 833,
+        "max": 6667,
+        "p95": 1634.0,
+        "p99": 4935.0
       },
       "memory": {
         "serialized_bytes": 699834

@@ -9,15 +9,15 @@
   "results": [
     {
       "method": "hash_table",
-      "construction_time_s": 0.00692275000619702,
+      "construction_time_s": 0.009791124997718725,
       "inference_ns": {
-        "mean": 419.13,
-        "median": 416.0,
-        "std": 181.44534466334483,
-        "min": 42.0,
-        "max": 1000.0,
+        "mean": 458.77,
+        "median": 417.0,
+        "std": 269.7453931024587,
+        "min": 83.0,
+        "max": 2500.0,
         "p95": 710.0999999999999,
-        "p99": 959.4100000000002
+        "p99": 1097.1700000000073
       },
       "memory": {
         "theoretical": 1188890,
@@ -28,15 +28,15 @@
     },
     {
       "method": "cpp_hash_table",
-      "construction_time_s": 0.011686459001793992,
+      "construction_time_s": 0.0134189999953378,
       "inference_ns": {
-        "mean": 492.95,
-        "median": 500.0,
-        "std": 134.2077028340773,
-        "min": 167.0,
-        "max": 958.0,
-        "p95": 708.0,
-        "p99": 793.6600000000009
+        "mean": 661.63,
+        "median": 541.0,
+        "std": 470.7686407355528,
+        "min": 166.0,
+        "max": 3916.0,
+        "p95": 1300.3499999999995,
+        "p99": 1977.58000000001
       },
       "memory": {
         "theoretical": 1188890,
@@ -47,15 +47,15 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.020626416997401975,
+      "construction_time_s": 0.01767091699730372,
       "inference_ns": {
-        "mean": 196.32,
+        "mean": 178.34,
         "median": 167.0,
-        "std": 69.54335050887325,
+        "std": 58.006589280873946,
         "min": 125.0,
-        "max": 542.0,
-        "p95": 296.14999999999975,
-        "p99": 500.4200000000002
+        "max": 583.0,
+        "p95": 291.0,
+        "p99": 417.67000000000087
       },
       "memory": {
         "serialized": 10048,
@@ -66,10 +66,10 @@
           "metadata_bytes": 652.0,
           "bucket_stats": {
             "num_buckets": 12,
-            "total_solution_bits": 48289,
-            "avg_solution_bits": 4024.0833333333335,
-            "min_solution_bits": 3876,
-            "max_solution_bits": 4168
+            "total_solution_bits": 48261,
+            "avg_solution_bits": 4021.75,
+            "min_solution_bits": 3878,
+            "max_solution_bits": 4140
           },
           "huffman_stats": {
             "num_unique_symbols": 101,
@@ -105,15 +105,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.019123083002341446,
+      "construction_time_s": 0.018744542001513764,
       "inference_ns": {
-        "mean": 217.55,
+        "mean": 213.79,
         "median": 208.0,
-        "std": 41.395259390418126,
+        "std": 32.56571663575055,
         "min": 166.0,
-        "max": 416.0,
-        "p95": 294.0499999999999,
-        "p99": 375.4100000000002
+        "max": 334.0,
+        "p95": 250.0,
+        "p99": 333.01
       },
       "memory": {
         "serialized": 10527,
@@ -164,15 +164,15 @@
     },
     {
       "method": "java_csf",
-      "construction_time_s": 0.16048,
+      "construction_time_s": 0.188973,
       "inference_ns": {
-        "mean": 355.0,
-        "median": 334.0,
-        "std": 97.0,
+        "mean": 326.0,
+        "median": 333.0,
+        "std": 71.0,
         "min": 291,
-        "max": 1208,
-        "p95": 417.0,
-        "p99": 466.0
+        "max": 958,
+        "p95": 375.0,
+        "p99": 464.0
       },
       "memory": {
         "num_bits": 160691,
@@ -185,20 +185,56 @@
     },
     {
       "method": "java_mph",
-      "construction_time_s": 0.427382,
+      "construction_time_s": 0.5715,
       "inference_ns": {
-        "mean": 1528.0,
+        "mean": 1551.0,
         "median": 1375.0,
-        "std": 1018.0,
-        "min": 1000,
-        "max": 8625,
-        "p95": 2796.0,
-        "p99": 7305.0
+        "std": 917.0,
+        "min": 958,
+        "max": 7583,
+        "p95": 2627.0,
+        "p99": 7542.0
       },
       "memory": {
         "serialized_bytes": 699365
       },
       "filter_params": null,
+      "filter_type": null
+    },
+    {
+      "method": "lsf_burr_burr",
+      "construction_time_s": 0.009028874999999999,
+      "inference_ns": {
+        "mean": 18.668297
+      },
+      "memory": {
+        "serialized_bytes": 88591,
+        "bits_per_key": 7.08728,
+        "model_bits_per_key": 0
+      },
+      "filter_params": {
+        "competitor": "BuRR",
+        "storage": "BuRR",
+        "cross_entropy_bits_per_key": null
+      },
+      "filter_type": null
+    },
+    {
+      "method": "lsf_ourcsf_filtered-huffmancsf_opt",
+      "construction_time_s": 0.019272958,
+      "inference_ns": {
+        "mean": 50.025753
+      },
+      "memory": {
+        "serialized_bytes": 8263,
+        "bits_per_key": 0.66104,
+        "model_bits_per_key": 0.03232
+      },
+      "filter_params": {
+        "competitor": "ourCSF",
+        "storage": "Filtered-HuffmanCSF_Opt",
+        "cross_entropy_bits_per_key": null
+      },
       "filter_type": null
     }
   ]

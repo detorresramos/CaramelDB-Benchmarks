@@ -1,0 +1,48 @@
+
+% Uniform-100
+\begin{tabular}{lrrrrrr}
+\toprule
+Method & \multicolumn{2}{c}{$\alpha\!=\!0.5$} & \multicolumn{2}{c}{$\alpha\!=\!0.8$} & \multicolumn{2}{c}{$\alpha\!=\!0.95$} \\
+ & bits/key & ns & bits/key & ns & bits/key & ns \\
+\midrule
+Caramel & 5.2 & 239 & \textbf{2.5} & 233 & 0.8 & 178 \\
+Caramel (Shibuya) & 5.5 & 319 & 2.7 & 277 & 0.8 & 214 \\
+Sux4J CSF & 5.0 & 346 & 2.8 & 364 & 1.7 & 326 \\
+LSF CSF & \textbf{4.4} & 52 & 2.6 & 47 & \textbf{0.7} & 50 \\
+LSF BuRR & 7.1 & \textbf{19} & 7.1 & \textbf{19} & 7.1 & \textbf{19} \\
+Java MPH & 35.0 & 1412 & 49.0 & 1331 & 55.9 & 1551 \\
+C++ Hash Table & 95.1 & 490 & 95.1 & 509 & 95.1 & 662 \\
+\bottomrule
+\end{tabular}
+
+% Zipfian
+\begin{tabular}{lrrrrrr}
+\toprule
+Method & \multicolumn{2}{c}{$\alpha\!=\!0.5$} & \multicolumn{2}{c}{$\alpha\!=\!0.8$} & \multicolumn{2}{c}{$\alpha\!=\!0.95$} \\
+ & bits/key & ns & bits/key & ns & bits/key & ns \\
+\midrule
+Caramel & 4.6 & 265 & 2.3 & 225 & \textbf{0.8} & \textbf{180} \\
+Caramel (Shibuya) & 4.9 & 283 & 2.4 & 352 & 0.8 & 229 \\
+Sux4J CSF & 5.0 & 397 & 2.9 & 305 & 1.8 & 333 \\
+LSF CSF & \textbf{3.4} & \textbf{69} & \textbf{2.1} & \textbf{61} & --- & --- \\
+LSF BuRR & --- & --- & --- & --- & --- & --- \\
+Java MPH & 35.4 & 1195 & 49.2 & 1169 & 56.0 & 1323 \\
+C++ Hash Table & 95.1 & 533 & 95.1 & 488 & 95.1 & 561 \\
+\bottomrule
+\end{tabular}
+
+% Unique
+\begin{tabular}{lrrrrrr}
+\toprule
+Method & \multicolumn{2}{c}{$\alpha\!=\!0.5$} & \multicolumn{2}{c}{$\alpha\!=\!0.8$} & \multicolumn{2}{c}{$\alpha\!=\!0.95$} \\
+ & bits/key & ns & bits/key & ns & bits/key & ns \\
+\midrule
+Caramel & 26.3 & 346 & 10.6 & 277 & 2.7 & 188 \\
+Caramel (Shibuya) & 27.3 & 383 & 11.0 & 278 & 2.7 & 236 \\
+Sux4J CSF & 41.9 & 679 & 17.2 & 347 & 5.1 & 330 \\
+LSF CSF & \textbf{8.9} & \textbf{110} & \textbf{4.1} & \textbf{74} & \textbf{1.0} & \textbf{61} \\
+LSF BuRR & --- & --- & --- & --- & --- & --- \\
+Java MPH & 43.9 & 1676 & 52.2 & 1314 & 56.4 & 1390 \\
+C++ Hash Table & 95.1 & 1129 & 95.1 & 801 & 95.1 & 736 \\
+\bottomrule
+\end{tabular}
