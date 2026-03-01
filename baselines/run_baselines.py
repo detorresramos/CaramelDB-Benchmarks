@@ -1,10 +1,18 @@
 """Experiment runner for baseline comparisons.
 
 Usage:
-    python baselines/run_baselines.py                              # default sweep
-    python baselines/run_baselines.py --alpha 0.8 --n 100000      # single config
-    python baselines/run_baselines.py --filter-type binary_fuse    # specify filter
+    python baselines/run_baselines.py                              # full sweep, all methods
+    python baselines/run_baselines.py --method hash_table          # just hash table
+    python baselines/run_baselines.py --method java_csf java_mph   # just Java methods
+    python baselines/run_baselines.py --method hash_table --minority-dist zipfian --alpha 0.7
+    python baselines/run_baselines.py --alpha 0.8 --n 100000      # single config, all methods
     python baselines/run_baselines.py --dataset data.csv           # custom dataset CSV
+
+Results are saved per-config to baselines/figures/data/ and merged with
+existing results, so you can run methods incrementally.
+
+Available methods: hash_table, cpp_hash_table, csf_optimal, csf_shibuya,
+                   java_csf, java_mph, learned_csf
 """
 
 import argparse
@@ -32,7 +40,6 @@ from baselines.methods import (
     HashTable,
     JavaCSF,
     JavaMPH,
-    LSFAll,
     LSFLearned,
 )
 
@@ -46,6 +53,16 @@ NUM_INFERENCE_QUERIES = 100
 SWEEP_NS = [100_000, 1_000_000, 10_000_000]
 SWEEP_ALPHAS = [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99]
 SWEEP_DISTS = ["uniform_100", "zipfian", "unique"]
+
+ALL_METHODS = [
+    "hash_table",
+    "cpp_hash_table",
+    "csf_optimal",
+    "csf_shibuya",
+    "java_csf",
+    "java_mph",
+    "learned_csf",
+]
 
 
 def measure_inference_time(method, structure, keys, seed):
@@ -142,28 +159,48 @@ def load_dataset(path):
     return keys, np.array(values, dtype=np.uint32)
 
 
-def run_experiment(n, alpha, minority_dist, seed, filter_type, keys=None, values=None):
+def run_experiment(
+    n, alpha, minority_dist, seed, filter_type, methods=None, keys=None, values=None
+):
+    if methods is None:
+        methods = ALL_METHODS
+    methods = set(methods)
+
     if keys is None:
-        keys = gen_keys(n, seed=seed)
+        keys = gen_keys(n)
         values = gen_alpha_values(n, alpha, seed=seed, minority_dist=minority_dist)
     actual_alpha = compute_actual_alpha(values)
 
-    methods = [
-        HashTable(),
-        CppHashTable(),
-        CSFFilter(filter_type=filter_type, epsilon_strategy="optimal"),
-        CSFFilter(filter_type=filter_type, epsilon_strategy="shibuya"),
-    ]
-
     results = []
-    for method in methods:
+
+    local_methods = {
+        "hash_table": lambda: HashTable(),
+        "cpp_hash_table": lambda: CppHashTable(),
+        "csf_optimal": lambda: CSFFilter(
+            filter_type=filter_type, epsilon_strategy="optimal"
+        ),
+        "csf_shibuya": lambda: CSFFilter(
+            filter_type=filter_type, epsilon_strategy="shibuya"
+        ),
+    }
+    for method_key, make_method in local_methods.items():
+        if method_key not in methods:
+            continue
+        method = make_method()
         print(f"  Running {method.name}...")
         result = run_single_method(method, keys, values, seed)
         result["filter_type"] = getattr(method, "filter_type", None)
         results.append(result)
         _print_result_summary(result)
 
-    for java_method in [JavaCSF(), JavaMPH()]:
+    java_methods = {
+        "java_csf": lambda: JavaCSF(),
+        "java_mph": lambda: JavaMPH(),
+    }
+    for method_key, make_method in java_methods.items():
+        if method_key not in methods:
+            continue
+        java_method = make_method()
         print(f"  Running {java_method.name}...")
         result = run_java_method(java_method, keys, values, seed)
         if result is None:
@@ -173,39 +210,38 @@ def run_experiment(n, alpha, minority_dist, seed, filter_type, keys=None, values
         results.append(result)
         _print_result_summary(result)
 
-    lsf_method = LSFAll()
-    print(f"  Running {lsf_method.name} (Docker)...")
-    lsf_results = lsf_method.run_full_benchmark(keys, values, seed)
-    if lsf_results is None:
-        print("    Skipped (Docker not available or image not built)")
-    else:
-        for r in lsf_results:
-            r["filter_type"] = None
-            results.append(r)
-            _print_result_summary(r)
-
-    lsf_learned = LSFLearned()
-    num_classes = len(np.unique(values))
-    if num_classes <= 500:
-        est = "~2-5min"
-    elif num_classes <= 5000:
-        est = "~10-30min"
-    elif num_classes <= 20000:
-        est = "~30-60min, may timeout"
-    else:
-        est = "likely timeout under QEMU"
-    print(f"  Running {lsf_learned.name} ({num_classes} classes, est {est})...", flush=True)
-    learned_t0 = time.perf_counter()
-    lsf_learned_results = lsf_learned.run_full_benchmark(keys, values, seed)
-    learned_elapsed = time.perf_counter() - learned_t0
-    if lsf_learned_results is None:
-        print(f"    Skipped after {learned_elapsed:.0f}s (Docker not available or training failed)", flush=True)
-    else:
-        print(f"    Learned LSF completed in {learned_elapsed:.0f}s", flush=True)
-        for r in lsf_learned_results:
-            r["filter_type"] = None
-            results.append(r)
-            _print_result_summary(r)
+    if "learned_csf" in methods:
+        lsf_learned = LSFLearned()
+        num_classes = len(np.unique(values))
+        if num_classes <= 500:
+            est = "~2-5min"
+        elif num_classes <= 5000:
+            est = "~10-30min"
+        elif num_classes <= 20000:
+            est = "~30-60min, may timeout"
+        else:
+            est = "likely timeout under QEMU"
+        print(
+            f"  Running {lsf_learned.name} ({num_classes} classes, est {est})...",
+            flush=True,
+        )
+        learned_t0 = time.perf_counter()
+        lsf_learned_results = lsf_learned.run_full_benchmark(keys, values, seed)
+        learned_elapsed = time.perf_counter() - learned_t0
+        if lsf_learned_results is None:
+            print(
+                f"    Skipped after {learned_elapsed:.0f}s "
+                f"(Docker not available or training failed)",
+                flush=True,
+            )
+        else:
+            print(
+                f"    Learned LSF completed in {learned_elapsed:.0f}s", flush=True
+            )
+            for r in lsf_learned_results:
+                r["filter_type"] = None
+                results.append(r)
+                _print_result_summary(r)
 
     return {
         "dataset": {
@@ -220,7 +256,15 @@ def run_experiment(n, alpha, minority_dist, seed, filter_type, keys=None, values
 
 
 def save_json(data, path):
+    """Save experiment data, merging results into any existing file."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    if os.path.exists(path):
+        with open(path) as f:
+            existing = json.load(f)
+        by_method = {r["method"]: r for r in existing["results"]}
+        for r in data["results"]:
+            by_method[r["method"]] = r
+        data = {**data, "results": list(by_method.values())}
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
     print(f"Saved: {path}")
@@ -259,6 +303,13 @@ def parse_args():
         help="Path to CSV file with 'key' and 'value' columns",
     )
     parser.add_argument(
+        "--method",
+        choices=ALL_METHODS,
+        nargs="+",
+        default=None,
+        help="Methods to run (one or more). Omit for all methods.",
+    )
+    parser.add_argument(
         "--filter-type",
         choices=["xor", "binary_fuse", "bloom"],
         default=DEFAULT_FILTER_TYPE,
@@ -282,7 +333,14 @@ def main():
         )
 
         data = run_experiment(
-            n, alpha, "custom", args.seed, args.filter_type, keys=keys, values=values
+            n,
+            alpha,
+            "custom",
+            args.seed,
+            args.filter_type,
+            methods=args.method,
+            keys=keys,
+            values=values,
         )
         data["dataset"]["source"] = args.dataset
 
@@ -298,20 +356,9 @@ def main():
     total = len(configs)
     elapsed_times = []
 
-    # Rough time estimates based on observed Docker/QEMU performance:
-    # - uniform_100/zipfian: ~2-5min per config (few classes, fast TFLite)
-    # - unique: ~5min (high alpha, few classes) to 60min timeout (low alpha, 50K classes)
-    n_unique = sum(1 for d, _, _ in configs if d == "unique")
-    n_other = total - n_unique
-    est_min = n_other * 2 + n_unique * 5
-    est_max = n_other * 5 + n_unique * 60
-    print(
-        f"Sweep: {total} configs ({n_other} uniform/zipfian, {n_unique} unique). "
-        f"Estimated {est_min // 60}h{est_min % 60:02d}m - {est_max // 60}h{est_max % 60:02d}m total.",
-        flush=True,
-    )
+    methods_desc = ", ".join(args.method) if args.method else "all"
+    print(f"Sweep: {total} configs, methods: {methods_desc}", flush=True)
 
-    all_results = []
     for idx, (dist, n, alpha) in enumerate(configs, 1):
         eta_str = ""
         if elapsed_times:
@@ -329,7 +376,9 @@ def main():
         )
 
         config_t0 = time.perf_counter()
-        data = run_experiment(n, alpha, dist, args.seed, args.filter_type)
+        data = run_experiment(
+            n, alpha, dist, args.seed, args.filter_type, methods=args.method
+        )
         config_elapsed = time.perf_counter() - config_t0
         elapsed_times.append(config_elapsed)
 
@@ -338,22 +387,8 @@ def main():
         else:
             print(f"  Config took {config_elapsed:.1f}s", flush=True)
 
-        all_results.append(data)
-
         filename = f"baselines_n{n}_a{alpha}_{dist}_{args.filter_type}.json"
         save_json(data, os.path.join(DATA_DIR, filename))
-
-    combined = {
-        "filter_type": args.filter_type,
-        "ns": ns,
-        "alphas": alphas,
-        "dists": dists,
-        "seed": args.seed,
-        "experiments": all_results,
-    }
-    save_json(
-        combined, os.path.join(DATA_DIR, f"baselines_sweep_{args.filter_type}.json")
-    )
 
 
 if __name__ == "__main__":

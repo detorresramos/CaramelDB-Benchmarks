@@ -1,16 +1,16 @@
-# CaramelDB Benchmarks
+# AutoCSF Benchmarks
 
 Experiments and baseline comparisons for [CaramelDB](https://github.com/detorresramos/CaramelDB).
 
 ## Quick Start
 
 Clone, build CaramelDB, and install Python dependencies. This is all you need
-to run the core experiments (paper plots, hash table baselines, shibuya
+to run the core experiments (theory validation, hash table baselines, shibuya
 comparison).
 
 ```bash
-git clone --recursive https://github.com/detorresramos/CaramelDB-Benchmarks.git
-cd CaramelDB-Benchmarks
+git clone --recursive https://github.com/detorresramos/AutoCSF-Benchmarks.git
+cd AutoCSF-Benchmarks
 
 # Build CaramelDB and install Python bindings
 deps/CaramelDB/bin/build.py
@@ -27,15 +27,15 @@ pip install -r requirements.txt
 
 ## Running Experiments
 
-### Paper Plots
+### Theory Validation
 
 Validates theoretical lower/upper bounds on bits/key saved against empirical
 measurements across filter types (XOR, BinaryFuse, Bloom) and value
 distributions (unique, Zipfian, uniform-100).
 
 ```bash
-python paper_plots/run_experiments.py   # generate data
-python paper_plots/make_plots.py        # generate figures
+python theory_validation/run_experiments.py   # generate data
+python theory_validation/make_plots.py        # generate figures
 ```
 
 ### Baselines
@@ -56,7 +56,8 @@ Head-to-head of theory-guided Bloom filter parameter selection vs Shibuya et
 al.'s empirical entropy-based approach.
 
 ```bash
-python shibuya_comparison/make_plots.py
+python shibuya_comparison/run_experiments.py   # generate data
+python shibuya_comparison/make_plots.py        # generate figures
 ```
 
 ### Run Everything
@@ -96,7 +97,7 @@ deps/
   LearnedStaticFunction/    # submodule — learned CSF baseline
   java/                     # Java baseline implementations
 shared/                     # shared utilities (data_gen, theory, measure, shibuya)
-paper_plots/                # theory validation experiments
+theory_validation/          # theory validation experiments
 baselines/                  # baseline comparisons
 shibuya_comparison/         # epsilon selection comparison
 ```

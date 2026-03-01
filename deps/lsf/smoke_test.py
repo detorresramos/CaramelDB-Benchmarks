@@ -31,7 +31,7 @@ def main():
     seed = 42
 
     print(f"Generating {N} keys (alpha={alpha}, dist={dist})...")
-    keys = gen_keys(N, seed=seed)
+    keys = gen_keys(N)
     values = gen_alpha_values(N, alpha, seed=seed, minority_dist=dist)
     n_classes = len(np.unique(values))
     print(f"  {n_classes} distinct classes")

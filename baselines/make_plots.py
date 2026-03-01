@@ -6,6 +6,7 @@ Usage:
 """
 
 import argparse
+import glob
 import json
 import os
 import sys
@@ -28,9 +29,7 @@ METHOD_DISPLAY = {
     "csf_filter_shibuya_bloom": "CSF+Bloom (Shibuya)",
     "java_csf": "Java CSF (Sux4J)",
     "java_mph": "Java MPH Table",
-    "lsf_ourcsf_filtered-huffmancsf_opt": "LSF CSF",
-    "lsf_burr_burr": "LSF BuRR",
-    "lsf_ours_filtered-huffman_opt": "LSF Learned",
+    "lsf_ours_filtered-huffman_opt": "Learned CSF",
 }
 
 
@@ -40,8 +39,6 @@ METHOD_MARKERS = {
     "csf_filter_shibuya": "^",
     "java_csf": "s",
     "java_mph": "P",
-    "lsf_ourcsf": "X",
-    "lsf_burr": "v",
     "lsf_ours_filtered-huffman_opt": "d",
 }
 
@@ -51,8 +48,6 @@ METHOD_COLORS = {
     "csf_filter_shibuya": "tab:orange",
     "java_csf": "tab:green",
     "java_mph": "tab:purple",
-    "lsf_ourcsf": "tab:brown",
-    "lsf_burr": "tab:pink",
     "lsf_ours_filtered-huffman_opt": "tab:olive",
 }
 
@@ -78,6 +73,16 @@ def load_json(path):
         return None
     with open(path) as f:
         return json.load(f)
+
+
+def load_all_experiments(data_dir, filter_type):
+    """Load all individual experiment JSON files for the given filter type."""
+    pattern = os.path.join(data_dir, f"baselines_n*_a*_*_{filter_type}.json")
+    experiments = []
+    for path in sorted(glob.glob(pattern)):
+        with open(path) as f:
+            experiments.append(json.load(f))
+    return experiments
 
 
 def _format_n(n):
@@ -343,14 +348,12 @@ def main():
         }
     )
 
-    sweep_path = os.path.join(DATA_DIR, f"baselines_sweep_{args.filter_type}.json")
-    sweep = load_json(sweep_path)
-
-    if sweep is None:
-        print(f"No sweep file found at {sweep_path}. Run run_baselines.py first.")
+    experiments = load_all_experiments(DATA_DIR, args.filter_type)
+    if not experiments:
+        print(f"No experiment files found in {DATA_DIR}. Run run_baselines.py first.")
         return
 
-    experiments = sweep["experiments"]
+    print(f"Loaded {len(experiments)} experiment files.")
 
     # Print tables to stdout
     print_table(

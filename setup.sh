@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install all dependencies for CaramelDB-Benchmarks on Ubuntu 24.04 x86_64.
+# Install all dependencies for AutoCSF-Benchmarks on Ubuntu 24.04 x86_64.
 #
 # Usage:
 #   sudo ./setup.sh          # install system packages + build everything

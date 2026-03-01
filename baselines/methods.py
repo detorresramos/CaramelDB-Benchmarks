@@ -335,9 +335,5 @@ class LSFBenchmark:
         return {"competitor": self.competitor, "learned": self.learned}
 
 
-def LSFAll():
-    return LSFBenchmark("all", learned=False)
-
-
 def LSFLearned():
     return LSFBenchmark("LSF", learned=True)

@@ -43,11 +43,8 @@ STYLES = {
     "java_csf": dict(
         label="Sux4J CSF", color="#1b7837", marker="s", lw=1.5, ms=6
     ),
-    "lsf_ourcsf_filtered-huffmancsf_opt": dict(
-        label="LSF CSF", color="#e08214", marker="X", lw=1.5, ms=6
-    ),
-    "lsf_burr_burr": dict(
-        label="LSF BuRR", color="#d6604d", marker="D", lw=1.5, ms=6
+    "lsf_ours_filtered-huffman_opt": dict(
+        label="Learned CSF", color="#e08214", marker="X", lw=1.5, ms=6
     ),
     "java_mph": dict(
         label="Java MPH", color="#762a83", marker="P", lw=1.0, ms=5
@@ -63,15 +60,13 @@ PARETO_METHODS = [
     "csf_filter_optimal_binary_fuse",
     "csf_filter_shibuya_bloom",
     "java_csf",
-    "lsf_ourcsf_filtered-huffmancsf_opt",
-    "lsf_burr_burr",
+    "lsf_ours_filtered-huffman_opt",
 ]
 MEMORY_ALPHA_METHODS = [
     "csf_filter_optimal_binary_fuse",
     "csf_filter_shibuya_bloom",
     "java_csf",
-    "lsf_ourcsf_filtered-huffmancsf_opt",
-    "lsf_burr_burr",
+    "lsf_ours_filtered-huffman_opt",
 ]
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
