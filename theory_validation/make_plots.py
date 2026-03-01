@@ -245,30 +245,29 @@ def plot_epsilon_sweep(data, filter_label, ax=None, show_legend=True):
     )
     ax.axhline(y=0, color="gray", linestyle="-", alpha=0.5, linewidth=1)
 
-    # Theory optimal vertical line
-    best_param, _ = compute_theory_best(filter_label, alpha, n_over_N, n_filter)
-    _, eps_theory = compute_params(filter_label, best_param, n_filter)
+    # Theory optimal vertical line (continuous optimum of lower bound)
+    theory_opt_idx = int(np.argmax(lb_cont))
+    eps_theory = float(eps_cont[theory_opt_idx])
     ax.axvline(
         x=eps_theory,
         color="blue",
         linestyle=":",
         alpha=0.7,
         linewidth=1.5,
-        label=f"Theory opt ({pk}={best_param})",
+        label=rf"Theory opt ($\varepsilon^*$={eps_theory:.3f})",
     )
 
-    # Empirical optimal vertical line
+    # Empirical optimal vertical line (best discrete parameter)
     best_idx = int(np.argmax(bpk_saved))
     best_emp_param = param_vals[best_idx]
-    if best_emp_param != best_param:
-        ax.axvline(
-            x=eps_discrete[best_idx],
-            color="red",
-            linestyle=":",
-            alpha=0.7,
-            linewidth=1.5,
-            label=f"Empirical opt ({pk}={best_emp_param})",
-        )
+    ax.axvline(
+        x=eps_discrete[best_idx],
+        color="red",
+        linestyle=":",
+        alpha=0.7,
+        linewidth=1.5,
+        label=f"Empirical opt ({pk}={best_emp_param})",
+    )
 
     ax.set_xscale("log")
     ax.set_xlabel(r"$\varepsilon$ (false positive rate)")
