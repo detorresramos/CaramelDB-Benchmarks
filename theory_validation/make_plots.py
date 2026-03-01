@@ -98,7 +98,6 @@ def plot_alpha_sweep(data, filter_label, ax=None):
 
     alphas = []
     lb_vals = []
-    ub_vals = []
     best_empirical = []
 
     for r in data["results"]:
@@ -111,11 +110,8 @@ def plot_alpha_sweep(data, filter_label, ax=None):
 
         alphas.append(alpha)
         lb_vals.append(theory.lower_bound(alpha, eps, b_eps, n_over_N))
-        ub_vals.append(theory.upper_bound(alpha, eps, b_eps, n_over_N))
         best_empirical.append(r["best_empirical_bpk_saved"])
 
-    ax.fill_between(alphas, lb_vals, ub_vals, alpha=0.2, color="blue")
-    ax.plot(alphas, ub_vals, "b-", linewidth=1.5, label="Upper bound")
     ax.plot(alphas, lb_vals, "b--", linewidth=1.5, label="Lower bound")
     ax.plot(
         alphas,
@@ -217,13 +213,17 @@ def plot_epsilon_sweep(data, filter_label, ax=None):
     eps_max = min(max(eps_discrete) * 2, 0.999)
     eps_cont = np.logspace(np.log10(eps_min), np.log10(eps_max), 500)
     lb_cont = []
+    ub_cont = []
     for e in eps_cont:
         try:
             b = compute_b_eps(filter_label, e, n_filter)
         except (ValueError, ZeroDivisionError):
             b = float("inf")
         lb_cont.append(theory.lower_bound(alpha, e, b, n_over_N))
+        ub_cont.append(theory.upper_bound(alpha, e, b, n_over_N))
 
+    ax.fill_between(eps_cont, lb_cont, ub_cont, alpha=0.15, color="blue")
+    ax.plot(eps_cont, ub_cont, "b-", linewidth=1, label="Upper bound")
     ax.plot(eps_cont, lb_cont, "b--", linewidth=1.5, label="Lower bound")
     ax.plot(
         eps_discrete, bpk_saved, "ro-", linewidth=2, markersize=6, label="Empirical"
