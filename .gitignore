@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.egg-info/
+*.eggs/
+dist/
+build/
+.DS_Store
+
+# Generated figures and data (regenerate with run_all.sh)
+*/figures/
