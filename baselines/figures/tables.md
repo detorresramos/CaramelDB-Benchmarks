@@ -58,7 +58,7 @@
 | CSF+Bloom (Shibuya) | 400 | 354 | 300 | 341 | 312 | 236 | 236 |
 | Java CSF (Sux4J) | 667 | 1320 | 399 | 377 | 365 | 330 | 358 |
 | Java MPH Table | 1363 | 1439 | 1400 | 1236 | 1383 | 1390 | 1505 |
-| Learned CSF | 3997545 | 3116383 | 2299834 | 1485353 | 601561 | 243241 | 36641 |
+| Learned CSF | 3997545 | 3116383 | 2395699 | 1431918 | 601561 | 243241 | 36641 |
 
 
 ### Avg Inference Time (ns) — binary_fuse [zipfian]
@@ -94,7 +94,7 @@
 | CSF+Bloom (Shibuya) | 0.084 | 0.070 | 0.078 | 0.051 | 0.038 | 0.026 | 0.020 |
 | Java CSF (Sux4J) | 0.559 | 0.518 | 0.619 | 0.339 | 0.238 | 0.198 | 0.190 |
 | Java MPH Table | 0.496 | 0.527 | 0.539 | 0.487 | 0.485 | 0.472 | 0.627 |
-| Learned CSF | 793.065 | 626.495 | 458.455 | 296.236 | 184.074 | 85.772 | 21.813 |
+| Learned CSF | ~983 | 785.224 | 589.425 | 359.657 | 184.074 | 85.772 | 21.813 |
 
 
 ### Construction Time (s) — binary_fuse [zipfian]
@@ -107,3 +107,44 @@
 | Java CSF (Sux4J) | 0.291 | 0.268 | 0.238 | 0.185 | 0.172 | 0.169 | 0.160 |
 | Java MPH Table | 0.569 | 0.515 | 0.552 | 0.490 | 0.428 | 0.470 | 0.419 |
 | Learned CSF | 32.064 | 30.174 | 26.529 | 22.474 | 17.973 | 13.284 | 8.633 |
+
+
+---
+
+# Genomics Datasets — binary_fuse
+
+
+### Memory (bits/key) — Genomics Datasets
+
+| Method | E. coli Sakai (N=5.3M, α=0.97) | SRR10211353 (N=9.8M, α=0.20) | C. elegans (N=69.7M, α=0.82) |
+| --- | --- | --- | --- |
+| C++ Hash Table | 152.0 | 152.0 | 152.0 |
+| CSF+BinaryFuse (Optimal) | 0.30 | 4.20 | 1.23 |
+| CSF+Bloom (Shibuya) | 0.34 | 4.23 | 1.36 |
+| Java CSF (Sux4J) | 1.24 | 3.59 | 1.59 |
+| Java MPH Table | 11.55 | 11.55 | 11.55 |
+| Learned CSF | 0.33 | 3.49 | timeout |
+
+
+### Avg Inference Time (ns) — Genomics Datasets
+
+| Method | E. coli Sakai (N=5.3M, α=0.97) | SRR10211353 (N=9.8M, α=0.20) | C. elegans (N=69.7M, α=0.82) |
+| --- | --- | --- | --- |
+| C++ Hash Table | 812 | 904 | 994 |
+| CSF+BinaryFuse (Optimal) | 335 | 457 | 394 |
+| CSF+Bloom (Shibuya) | 432 | 594 | 385 |
+| Java CSF (Sux4J) | 598 | 621 | 853 |
+| Java MPH Table | 1,666 | 1,716 | 2,054 |
+| Learned CSF | 1,725 | 8,312 | timeout |
+
+
+### Construction Time (s) — Genomics Datasets
+
+| Method | E. coli Sakai (N=5.3M, α=0.97) | SRR10211353 (N=9.8M, α=0.20) | C. elegans (N=69.7M, α=0.82) |
+| --- | --- | --- | --- |
+| C++ Hash Table | 1.4 | 2.6 | 18.5 |
+| CSF+BinaryFuse (Optimal) | 0.7 | 4.3 | 13.7 |
+| CSF+Bloom (Shibuya) | 0.9 | 4.4 | 15.1 |
+| Java CSF (Sux4J) | 1.3 | 4.6 | 17.8 |
+| Java MPH Table | 8.1 | 13.6 | 136.3 |
+| Learned CSF | 127.4 | 501.4 | timeout |

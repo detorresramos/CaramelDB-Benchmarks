@@ -219,7 +219,7 @@ def _run_java_benchmark(jar_path, main_class, keys, values, seed, num_queries=10
             "--add-opens=java.base/java.io=ALL-UNNAMED",
             "--add-opens=java.base/java.nio=ALL-UNNAMED",
             "--enable-native-access=ALL-UNNAMED",
-            "-Xmx4g",
+            f"-Xmx{max(4, len(keys) // 5_000_000)}g",
             "-cp",
             jar_path,
             main_class,

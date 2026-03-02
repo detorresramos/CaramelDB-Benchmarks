@@ -141,9 +141,19 @@ def load_dataset(path):
     values = []
     with open(path, newline="") as f:
         reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames
+        if "key" in fieldnames and "value" in fieldnames:
+            key_col, val_col = "key", "value"
+        elif "kmer" in fieldnames and "count" in fieldnames:
+            key_col, val_col = "kmer", "count"
+        else:
+            raise ValueError(
+                f"CSV must have 'key'/'value' or 'kmer'/'count' columns, "
+                f"got: {fieldnames}"
+            )
         for row in reader:
-            keys.append(row["key"])
-            values.append(int(row["value"]))
+            keys.append(row[key_col])
+            values.append(int(row[val_col]))
     return keys, np.array(values, dtype=np.uint32)
 
 
