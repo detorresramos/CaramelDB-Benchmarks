@@ -117,15 +117,20 @@ def train_and_export(data_dir, dataset_name, X_train, X_test, y_train, y_test,
         with open(tflite_path, "wb") as f:
             f.write(tflite_model)
 
-        # Evaluate
+        # Evaluate (batched to avoid OOM on large datasets)
         interp = tf.lite.Interpreter(model_content=tflite_model)
         interp.allocate_tensors()
         runner = interp.get_signature_runner("serving_default")
-        tflite_y = runner(input=X_test)
-        tflite_y = list(tflite_y.values())[0]
-        if num_classes == 2:
-            tflite_y = np.column_stack([1 - tflite_y, tflite_y])
-        accuracy = np.mean(np.argmax(tflite_y, axis=1) == y_test)
+        eval_batch = 100_000
+        correct = 0
+        for start in range(0, len(X_test), eval_batch):
+            end = min(start + eval_batch, len(X_test))
+            batch_y = runner(input=X_test[start:end])
+            batch_y = list(batch_y.values())[0]
+            if num_classes == 2:
+                batch_y = np.column_stack([1 - batch_y, batch_y])
+            correct += np.sum(np.argmax(batch_y, axis=1) == y_test[start:end])
+        accuracy = correct / len(X_test)
 
         eval_path = tflite_path + "_eval.txt"
         with open(eval_path, "w") as f:

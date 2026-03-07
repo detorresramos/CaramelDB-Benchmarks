@@ -4,11 +4,13 @@ Usage:
     python deps/lsf/run_benchmark.py keys.txt values.bin [--competitor CSF|BuRR|all|LSF]
 
 Converts data to .lrbin, optionally trains models, runs ribbon_learned_bench
-natively (preferred) or via Docker (fallback), returns JSON.
+natively, returns JSON.
 """
 
+import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -20,11 +22,52 @@ sys.path.insert(0, os.path.join(_dir, ".."))
 
 from lsf.convert_to_lrbin import write_lrbin
 
-DOCKER_IMAGE = "caramel-lsf"
 DATASET_NAME = "caramel"
+MODEL_CACHE_DIR = os.path.join(_dir, "model_cache")
 
 _LSF_BUILD_DIR = os.path.normpath(os.path.join(_dir, "..", "LearnedStaticFunction", "build"))
 _NATIVE_BENCH_BIN = os.path.join(_LSF_BUILD_DIR, "ribbon_learned_bench")
+
+
+def _cache_key(keys, values):
+    """Hash dataset to create a stable cache key."""
+    h = hashlib.sha256()
+    h.update(str(len(keys)).encode())
+    h.update(keys[0].encode())
+    h.update(keys[-1].encode())
+    h.update(np.array(values, dtype=np.uint32).tobytes()[:4096])
+    h.update(np.array(values, dtype=np.uint32).tobytes()[-4096:])
+    return h.hexdigest()[:16]
+
+
+def _cache_models(data_dir, dataset_name, cache_dir):
+    """Copy trained models and standardized features to persistent cache."""
+    os.makedirs(cache_dir, exist_ok=True)
+    model_dir = os.path.join(data_dir, f"{dataset_name}_models")
+    if os.path.isdir(model_dir):
+        dst = os.path.join(cache_dir, f"{dataset_name}_models")
+        if os.path.exists(dst):
+            shutil.rmtree(dst)
+        shutil.copytree(model_dir, dst)
+    # Also cache the standardized X.lrbin (features are transformed by scaler)
+    x_path = os.path.join(data_dir, f"{dataset_name}_X.lrbin")
+    if os.path.isfile(x_path):
+        shutil.copy2(x_path, os.path.join(cache_dir, f"{dataset_name}_X.lrbin"))
+    sys.stderr.write(f"Cached models to {cache_dir}\n")
+
+
+def _restore_from_cache(cache_dir, data_dir, dataset_name):
+    """Restore cached models and standardized features. Returns True if cache hit."""
+    cached_models = os.path.join(cache_dir, f"{dataset_name}_models")
+    cached_x = os.path.join(cache_dir, f"{dataset_name}_X.lrbin")
+    if not os.path.isdir(cached_models):
+        return False
+    dst_models = os.path.join(data_dir, f"{dataset_name}_models")
+    shutil.copytree(cached_models, dst_models)
+    if os.path.isfile(cached_x):
+        shutil.copy2(cached_x, os.path.join(data_dir, f"{dataset_name}_X.lrbin"))
+    sys.stderr.write(f"Restored models from cache: {cache_dir}\n")
+    return True
 
 
 def parse_result_line(line):
@@ -47,16 +90,11 @@ def parse_result_line(line):
 
 
 def _train_models_locally(data_dir, dataset_name):
-    """Train TFLite models natively (outside Docker).
-
-    Docker runs with --platform linux/amd64 via QEMU, which can't handle
-    the x86 instructions in numpy/tensorflow. So we train natively and
-    pass the .tflite files into Docker for benchmarking.
-    """
+    """Train TFLite models for learned CSF."""
     train_script = os.path.join(_dir, "train_models.py")
     result = subprocess.run(
         [sys.executable, train_script, data_dir, dataset_name],
-        capture_output=True, text=True, timeout=1800,
+        capture_output=True, text=True,
     )
     if result.returncode != 0:
         sys.stderr.write(f"Model training failed:\n{result.stderr}\n")
@@ -72,7 +110,7 @@ def _native_bench_available():
 
 
 def run_lsf_native(keys, values, competitor="all", seed=42, learned=False):
-    """Run LSF benchmark natively (no Docker).
+    """Run LSF benchmark natively.
 
     Args:
         keys: list of string keys
@@ -91,8 +129,11 @@ def run_lsf_native(keys, values, competitor="all", seed=42, learned=False):
         write_lrbin(keys, values, output_prefix)
 
         if learned:
-            if not _train_models_locally(data_dir, DATASET_NAME):
-                return None
+            cache_dir = os.path.join(MODEL_CACHE_DIR, _cache_key(keys, values))
+            if not _restore_from_cache(cache_dir, data_dir, DATASET_NAME):
+                if not _train_models_locally(data_dir, DATASET_NAME):
+                    return None
+                _cache_models(data_dir, DATASET_NAME, cache_dir)
 
         env = os.environ.copy()
         env["DYLD_LIBRARY_PATH"] = _LSF_BUILD_DIR + ":" + env.get("DYLD_LIBRARY_PATH", "")
@@ -105,78 +146,12 @@ def run_lsf_native(keys, values, competitor="all", seed=42, learned=False):
             "-s", "filter_huf",  # only the canonical Filtered-Huffman_Opt variant
         ]
 
-        timeout = 3600 if learned else 600
-        try:
-            result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=timeout, env=env
-            )
-        except subprocess.TimeoutExpired:
-            sys.stderr.write(f"LSF benchmark timed out after {timeout}s\n")
-            return None
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, env=env
+        )
 
         if result.returncode != 0:
             sys.stderr.write(f"LSF benchmark failed (rc={result.returncode}):\n{result.stderr}\n")
-            if result.stdout:
-                sys.stderr.write(f"stdout:\n{result.stdout}\n")
-            return None
-
-        results = []
-        for line in result.stdout.splitlines():
-            parsed = parse_result_line(line)
-            if parsed:
-                results.append(parsed)
-
-        return results
-
-
-def run_lsf_docker(keys, values, competitor="all", seed=42, learned=False):
-    """Run LSF benchmark via Docker (fallback).
-
-    Args:
-        keys: list of string keys
-        values: numpy array of uint32 values
-        competitor: "CSF", "BuRR", "LSF", or "all"
-        seed: random seed
-        learned: if True, train models locally then benchmark with LSF competitor
-
-    Returns list of parsed result dicts, one per competitor/storage combo.
-    """
-    with tempfile.TemporaryDirectory(prefix="lsf_bench_") as tmpdir:
-        data_dir = os.path.join(tmpdir, "data")
-        os.makedirs(data_dir)
-
-        output_prefix = os.path.join(data_dir, DATASET_NAME)
-        write_lrbin(keys, values, output_prefix)
-
-        if learned:
-            if not _train_models_locally(data_dir, DATASET_NAME):
-                return None
-
-        container_name = f"lsf-bench-{os.getpid()}"
-        cmd = [
-            "docker", "run", "--rm",
-            "--name", container_name,
-            "--platform", "linux/amd64",
-            "-v", f"{data_dir}:/data",
-            DOCKER_IMAGE,
-            "bench-only", "/data/", DATASET_NAME, competitor,
-        ]
-
-        timeout = 3600 if learned else 600
-        try:
-            result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=timeout
-            )
-        except subprocess.TimeoutExpired:
-            sys.stderr.write(f"LSF benchmark timed out after {timeout}s\n")
-            subprocess.run(
-                ["docker", "kill", container_name],
-                capture_output=True, timeout=30,
-            )
-            return None
-
-        if result.returncode != 0:
-            sys.stderr.write(f"LSF benchmark failed:\n{result.stderr}\n")
             if result.stdout:
                 sys.stderr.write(f"stdout:\n{result.stdout}\n")
             return None
@@ -261,10 +236,10 @@ def main():
         open(args.values_path, "rb").read(), dtype=np.dtype(">u8")
     ).astype(np.uint32)
 
-    if _native_bench_available():
-        results = run_lsf_native(keys, values, args.competitor, learned=args.learned)
-    else:
-        results = run_lsf_docker(keys, values, args.competitor, learned=args.learned)
+    if not _native_bench_available():
+        print("Native benchmark binary not found. Build it first.")
+        sys.exit(1)
+    results = run_lsf_native(keys, values, args.competitor, learned=args.learned)
     if results:
         converted = results_to_json(results, keys, values, args.competitor)
         print(json.dumps(converted, indent=2))

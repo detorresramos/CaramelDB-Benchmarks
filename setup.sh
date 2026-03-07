@@ -41,18 +41,19 @@ if [ ! -d .venv ]; then
 fi
 source .venv/bin/activate
 pip install --upgrade pip
-pip install numpy matplotlib tqdm scikit-learn tensorflow
+pip install -r requirements.txt
+pip install -r requirements-lsf.txt
 
 # ---------------------------------------------------------------------------
 # Build CaramelDB (expected as sibling directory)
 # ---------------------------------------------------------------------------
-CARAMEL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)/CaramelDB"
+CARAMEL_DIR="$SCRIPT_DIR/deps/CaramelDB"
 if [ -d "$CARAMEL_DIR" ]; then
     echo "=== Building CaramelDB ==="
     (cd "$CARAMEL_DIR" && python bin/build.py)
 else
     echo "WARNING: CaramelDB not found at $CARAMEL_DIR"
-    echo "  Clone it as a sibling directory and run: cd CaramelDB && python bin/build.py"
+    echo "  Initialize the submodule: git submodule update --init deps/CaramelDB"
 fi
 
 # ---------------------------------------------------------------------------

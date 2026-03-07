@@ -229,7 +229,7 @@ def run_experiment(
         if lsf_learned_results is None:
             print(
                 f"    Skipped after {learned_elapsed:.0f}s "
-                f"(Docker not available or training failed)",
+                f"(native binary not built or training failed)",
                 flush=True,
             )
         else:

@@ -28,34 +28,33 @@
     },
     {
       "method": "cpp_hash_table",
-      "construction_time_s": 0.012602583003172185,
+      "construction_time_s": 0.006549792000441812,
       "inference_ns": {
-        "mean": 805.87,
-        "median": 542.0,
-        "std": 574.8201049893784,
-        "min": 166.0,
-        "max": 4084.0,
-        "p95": 1881.2499999999995,
-        "p99": 2186.1700000000096
+        "mean": 435.82,
+        "median": 375.0,
+        "std": 462.09331049042464,
+        "min": 167.0,
+        "max": 4542.0,
+        "p95": 961.0499999999998,
+        "p99": 1448.250000000016
       },
       "memory": {
-        "theoretical": 1188890,
-        "tracemalloc": 168
+        "theoretical": 1188890
       },
       "filter_params": null,
       "filter_type": null
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.017924667001352645,
+      "construction_time_s": 0.015432375003001653,
       "inference_ns": {
-        "mean": 184.13,
-        "median": 167.0,
-        "std": 44.13947326373526,
-        "min": 125.0,
-        "max": 458.0,
-        "p95": 211.0499999999999,
-        "p99": 417.4100000000002
+        "mean": 218.33,
+        "median": 208.0,
+        "std": 52.74107602239454,
+        "min": 166.0,
+        "max": 459.0,
+        "p95": 294.0499999999999,
+        "p99": 417.4200000000002
       },
       "memory": {
         "serialized": 7043,
@@ -66,10 +65,10 @@
           "metadata_bytes": 4111.0,
           "bucket_stats": {
             "num_buckets": 3,
-            "total_solution_bits": 13616,
-            "avg_solution_bits": 4538.666666666667,
-            "min_solution_bits": 4492,
-            "max_solution_bits": 4616
+            "total_solution_bits": 13638,
+            "avg_solution_bits": 4546.0,
+            "min_solution_bits": 4423,
+            "max_solution_bits": 4651
           },
           "huffman_stats": {
             "num_unique_symbols": 1001,
@@ -98,8 +97,7 @@
             "size_bits": null,
             "fingerprint_bits": 6
           }
-        },
-        "tracemalloc": 856
+        }
       },
       "filter_params": {
         "fingerprint_bits": 6
@@ -108,29 +106,29 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.020226708002155647,
+      "construction_time_s": 0.019882250009686686,
       "inference_ns": {
-        "mean": 235.76,
-        "median": 209.0,
-        "std": 44.18215024192462,
+        "mean": 276.59,
+        "median": 250.0,
+        "std": 54.14223767078712,
         "min": 208.0,
         "max": 500.0,
-        "p95": 333.0,
-        "p99": 376.2500000000006
+        "p95": 375.0,
+        "p99": 417.83000000000044
       },
       "memory": {
-        "serialized": 7034,
+        "serialized": 7050,
         "csf_stats": {
-          "in_memory_bytes": 6908,
-          "solution_bytes": 1672.0,
+          "in_memory_bytes": 6924,
+          "solution_bytes": 1688.0,
           "filter_bytes": 1125.0,
           "metadata_bytes": 4111.0,
           "bucket_stats": {
             "num_buckets": 3,
-            "total_solution_bits": 13289,
-            "avg_solution_bits": 4429.666666666667,
-            "min_solution_bits": 4364,
-            "max_solution_bits": 4512
+            "total_solution_bits": 13417,
+            "avg_solution_bits": 4472.333333333333,
+            "min_solution_bits": 4353,
+            "max_solution_bits": 4596
           },
           "huffman_stats": {
             "num_unique_symbols": 1001,
@@ -159,8 +157,7 @@
             "size_bits": 9000,
             "fingerprint_bits": null
           }
-        },
-        "tracemalloc": 784
+        }
       },
       "filter_params": {
         "bloom_bits_per_element": 9,

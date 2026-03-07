@@ -9,3 +9,6 @@ build/
 # Raw experiment data (regenerate with run scripts)
 */figures/data/
 
+# Cached trained models for LSF
+deps/lsf/model_cache/
+

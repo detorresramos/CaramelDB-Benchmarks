@@ -82,7 +82,7 @@ class CppHashTable:
 
     @staticmethod
     def construct(keys, values):
-        return carameldb.UnorderedMapBaseline(keys, np.array(values, dtype=np.uint32))
+        return carameldb.UnorderedMapBaseline(keys, np.array(values, dtype=np.uint32).tolist())
 
     @staticmethod
     def query(structure, key):
@@ -277,30 +277,11 @@ LSF_DIR = os.path.normpath(os.path.join(_dir, "..", "deps", "lsf"))
 sys.path.insert(0, os.path.join(_dir, ".."))
 
 
-def _docker_available():
-    try:
-        result = subprocess.run(
-            ["docker", "info"], capture_output=True, timeout=10
-        )
-        return result.returncode == 0
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return False
-
-
-def _lsf_image_exists():
-    try:
-        result = subprocess.run(
-            ["docker", "image", "inspect", "caramel-lsf"],
-            capture_output=True,
-            timeout=10,
-        )
-        return result.returncode == 0
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return False
-
-
 class LSFBenchmark:
-    """Runs LSF benchmarks natively (preferred) or via Docker (fallback)."""
+    """Runs LSF benchmarks natively.
+
+    Only LSFLearned() (competitor="LSF", learned=True) is used as the entry point.
+    """
 
     def __init__(self, competitor="all", learned=False):
         self.competitor = competitor
@@ -312,7 +293,6 @@ class LSFBenchmark:
         from deps.lsf.run_benchmark import (
             _native_bench_available,
             results_to_json,
-            run_lsf_docker,
             run_lsf_native,
         )
 
@@ -323,17 +303,10 @@ class LSFBenchmark:
                 seed=seed,
                 learned=self.learned,
             )
-        elif _docker_available() and _lsf_image_exists():
-            raw = run_lsf_docker(
-                keys, values,
-                competitor=self.competitor,
-                seed=seed,
-                learned=self.learned,
-            )
         else:
             warnings.warn(
-                "LSF benchmark not available: native binary not built "
-                "and Docker image not found. Build with: "
+                "LSF benchmark not available: native binary not built. "
+                "Build with: "
                 "cd deps/LearnedStaticFunction && mkdir build && cd build "
                 "&& cmake .. -DCMAKE_BUILD_TYPE=Release -DTFLITE_ENABLE_XNNPACK=OFF "
                 "&& cmake --build . --target ribbon_learned_bench"
