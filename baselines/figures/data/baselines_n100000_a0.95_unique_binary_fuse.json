@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.02724854100961238,
+      "construction_time_s": 0.011301749997073784,
       "inference_ns": {
-        "mean": 200.1,
-        "median": 167.0,
-        "std": 48.24033581972663,
-        "min": 166.0,
-        "max": 375.0,
-        "p95": 333.0,
-        "p99": 375.0
+        "mean": 82.62,
+        "median": 83.0,
+        "std": 38.55302322775737,
+        "min": 42.0,
+        "max": 250.0,
+        "p95": 167.0,
+        "p99": 209.4100000000002
       },
       "memory": {
-        "serialized": 33768,
+        "serialized": 33744,
         "csf_stats": {
-          "in_memory_bytes": 33588,
-          "solution_bytes": 10040.0,
+          "in_memory_bytes": 33564,
+          "solution_bytes": 10016.0,
           "filter_bytes": 3136.0,
           "metadata_bytes": 20412.0,
           "bucket_stats": {
             "num_buckets": 20,
-            "total_solution_bits": 79561,
-            "avg_solution_bits": 3978.05,
-            "min_solution_bits": 3413,
-            "max_solution_bits": 4693
+            "total_solution_bits": 79433,
+            "avg_solution_bits": 3971.65,
+            "min_solution_bits": 3402,
+            "max_solution_bits": 4736
           },
           "huffman_stats": {
             "num_unique_symbols": 5001,
@@ -109,15 +109,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.02627829200355336,
+      "construction_time_s": 0.012259250011993572,
       "inference_ns": {
-        "mean": 270.81,
-        "median": 250.0,
-        "std": 57.56469317211723,
-        "min": 208.0,
-        "max": 500.0,
-        "p95": 375.0,
-        "p99": 458.4200000000002
+        "mean": 92.91,
+        "median": 83.0,
+        "std": 42.015019933352406,
+        "min": 41.0,
+        "max": 250.0,
+        "p95": 167.0,
+        "p99": 250.0
       },
       "memory": {
         "serialized": 34247,

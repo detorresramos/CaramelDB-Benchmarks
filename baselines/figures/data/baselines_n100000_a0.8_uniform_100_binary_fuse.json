@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.0261956670001382,
+      "construction_time_s": 0.014192874994478188,
       "inference_ns": {
-        "mean": 287.0,
-        "median": 291.0,
-        "std": 70.50531894828929,
-        "min": 166.0,
-        "max": 542.0,
-        "p95": 416.05,
-        "p99": 500.4200000000002
+        "mean": 97.13,
+        "median": 84.0,
+        "std": 29.452556765075595,
+        "min": 42.0,
+        "max": 209.0,
+        "p95": 125.0,
+        "p99": 208.01
       },
       "memory": {
-        "serialized": 31320,
+        "serialized": 31393,
         "csf_stats": {
-          "in_memory_bytes": 31140,
-          "solution_bytes": 26696.0,
+          "in_memory_bytes": 31213,
+          "solution_bytes": 26752.0,
           "filter_bytes": 2976.0,
-          "metadata_bytes": 1468.0,
+          "metadata_bytes": 1485.0,
           "bucket_stats": {
-            "num_buckets": 60,
-            "total_solution_bits": 211507,
-            "avg_solution_bits": 3525.116666666667,
-            "min_solution_bits": 3027,
-            "max_solution_bits": 3872
+            "num_buckets": 61,
+            "total_solution_bits": 211882,
+            "avg_solution_bits": 3473.4754098360654,
+            "min_solution_bits": 2973,
+            "max_solution_bits": 3795
           },
           "huffman_stats": {
             "num_unique_symbols": 101,
@@ -103,15 +103,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.026626457998645492,
+      "construction_time_s": 0.014454417003435083,
       "inference_ns": {
-        "mean": 272.5,
-        "median": 250.0,
-        "std": 75.382027035627,
-        "min": 208.0,
-        "max": 750.0,
-        "p95": 375.0,
-        "p99": 544.0800000000011
+        "mean": 97.92,
+        "median": 84.0,
+        "std": 30.813529495986007,
+        "min": 41.0,
+        "max": 250.0,
+        "p95": 166.0,
+        "p99": 167.83000000000044
       },
       "memory": {
         "serialized": 34066,

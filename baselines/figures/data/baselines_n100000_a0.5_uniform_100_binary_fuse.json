@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.03940145799424499,
+      "construction_time_s": 0.04652816599991638,
       "inference_ns": {
-        "mean": 249.5,
-        "median": 250.0,
-        "std": 44.27809842348698,
-        "min": 166.0,
-        "max": 416.0,
-        "p95": 333.05,
-        "p99": 416.0
+        "mean": 133.72,
+        "median": 125.0,
+        "std": 36.43873762906723,
+        "min": 83.0,
+        "max": 375.0,
+        "p95": 167.0,
+        "p99": 251.25000000000063
       },
       "memory": {
-        "serialized": 65239,
+        "serialized": 65271,
         "csf_stats": {
-          "in_memory_bytes": 65059,
-          "solution_bytes": 55488.0,
+          "in_memory_bytes": 65091,
+          "solution_bytes": 55520.0,
           "filter_bytes": 7168.0,
           "metadata_bytes": 2403.0,
           "bucket_stats": {
             "num_buckets": 115,
-            "total_solution_bits": 440028,
-            "avg_solution_bits": 3826.330434782609,
-            "min_solution_bits": 3461,
-            "max_solution_bits": 4178
+            "total_solution_bits": 440748,
+            "avg_solution_bits": 3832.5913043478263,
+            "min_solution_bits": 3448,
+            "max_solution_bits": 4204
           },
           "huffman_stats": {
             "num_unique_symbols": 101,
@@ -103,15 +103,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.0414032499975292,
+      "construction_time_s": 0.029046582989394665,
       "inference_ns": {
-        "mean": 247.08,
-        "median": 250.0,
-        "std": 51.14580725729138,
-        "min": 208.0,
-        "max": 584.0,
-        "p95": 333.0,
-        "p99": 377.09000000000106
+        "mean": 108.27,
+        "median": 125.0,
+        "std": 29.513337662826277,
+        "min": 42.0,
+        "max": 209.0,
+        "p95": 166.05,
+        "p99": 208.01
       },
       "memory": {
         "serialized": 69027,

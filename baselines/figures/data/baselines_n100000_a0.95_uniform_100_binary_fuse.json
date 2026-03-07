@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.017167332989629358,
+      "construction_time_s": 0.007480291998945177,
       "inference_ns": {
-        "mean": 204.06,
-        "median": 208.0,
-        "std": 45.402162944071286,
-        "min": 166.0,
-        "max": 416.0,
-        "p95": 291.05,
-        "p99": 375.4100000000002
+        "mean": 88.17,
+        "median": 84.0,
+        "std": 32.62209527298944,
+        "min": 42.0,
+        "max": 167.0,
+        "p95": 166.0,
+        "p99": 167.0
       },
       "memory": {
-        "serialized": 10048,
+        "serialized": 10088,
         "csf_stats": {
-          "in_memory_bytes": 9868,
-          "solution_bytes": 6080.0,
+          "in_memory_bytes": 9908,
+          "solution_bytes": 6120.0,
           "filter_bytes": 3136.0,
           "metadata_bytes": 652.0,
           "bucket_stats": {
             "num_buckets": 12,
-            "total_solution_bits": 48325,
-            "avg_solution_bits": 4027.0833333333335,
-            "min_solution_bits": 3880,
-            "max_solution_bits": 4276
+            "total_solution_bits": 48506,
+            "avg_solution_bits": 4042.1666666666665,
+            "min_solution_bits": 3868,
+            "max_solution_bits": 4292
           },
           "huffman_stats": {
             "num_unique_symbols": 101,
@@ -103,15 +103,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.018627041994477622,
+      "construction_time_s": 0.0077337499969871715,
       "inference_ns": {
-        "mean": 286.65,
-        "median": 292.0,
-        "std": 43.76673965467385,
-        "min": 208.0,
-        "max": 416.0,
-        "p95": 375.0,
-        "p99": 416.0
+        "mean": 94.05,
+        "median": 83.0,
+        "std": 37.047368327588394,
+        "min": 41.0,
+        "max": 333.0,
+        "p95": 127.04999999999988,
+        "p99": 209.25000000000063
       },
       "memory": {
         "serialized": 10519,

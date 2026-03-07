@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.050818457995774224,
+      "construction_time_s": 0.030072249996010214,
       "inference_ns": {
-        "mean": 263.2,
-        "median": 250.0,
-        "std": 82.51799803679195,
-        "min": 166.0,
-        "max": 584.0,
-        "p95": 417.0,
-        "p99": 500.84000000000043
+        "mean": 129.13,
+        "median": 125.0,
+        "std": 50.508544821643795,
+        "min": 42.0,
+        "max": 292.0,
+        "p95": 250.0,
+        "p99": 291.01
       },
       "memory": {
-        "serialized": 132743,
+        "serialized": 132767,
         "csf_stats": {
-          "in_memory_bytes": 132563,
-          "solution_bytes": 47824.0,
+          "in_memory_bytes": 132587,
+          "solution_bytes": 47848.0,
           "filter_bytes": 2976.0,
           "metadata_bytes": 81763.0,
           "bucket_stats": {
             "num_buckets": 99,
-            "total_solution_bits": 379841,
-            "avg_solution_bits": 3836.777777777778,
-            "min_solution_bits": 3307,
-            "max_solution_bits": 4510
+            "total_solution_bits": 379840,
+            "avg_solution_bits": 3836.7676767676767,
+            "min_solution_bits": 3351,
+            "max_solution_bits": 4480
           },
           "huffman_stats": {
             "num_unique_symbols": 20001,
@@ -111,15 +111,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.05045458300446626,
+      "construction_time_s": 0.02723091699590441,
       "inference_ns": {
-        "mean": 302.8,
-        "median": 291.0,
-        "std": 79.85862508207865,
-        "min": 208.0,
-        "max": 583.0,
-        "p95": 458.0,
-        "p99": 542.4100000000002
+        "mean": 96.73,
+        "median": 84.0,
+        "std": 43.251787246309256,
+        "min": 41.0,
+        "max": 417.0,
+        "p95": 127.09999999999988,
+        "p99": 210.09000000000106
       },
       "memory": {
         "serialized": 136951,

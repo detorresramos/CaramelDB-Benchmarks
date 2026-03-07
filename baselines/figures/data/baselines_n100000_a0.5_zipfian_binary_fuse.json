@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.038087542008724995,
+      "construction_time_s": 0.024330582993570715,
       "inference_ns": {
-        "mean": 290.36,
-        "median": 250.0,
-        "std": 101.28588450519649,
-        "min": 167.0,
-        "max": 1000.0,
-        "p95": 418.0999999999999,
-        "p99": 546.5800000000023
+        "mean": 102.45,
+        "median": 84.0,
+        "std": 28.51328637670516,
+        "min": 42.0,
+        "max": 250.0,
+        "p95": 125.0,
+        "p99": 167.83000000000044
       },
       "memory": {
-        "serialized": 57440,
+        "serialized": 57296,
         "csf_stats": {
-          "in_memory_bytes": 57260,
-          "solution_bytes": 40928.0,
+          "in_memory_bytes": 57116,
+          "solution_bytes": 40784.0,
           "filter_bytes": 7168.0,
           "metadata_bytes": 9164.0,
           "bucket_stats": {
             "num_buckets": 84,
-            "total_solution_bits": 324676,
-            "avg_solution_bits": 3865.190476190476,
-            "min_solution_bits": 3469,
-            "max_solution_bits": 4246
+            "total_solution_bits": 323774,
+            "avg_solution_bits": 3854.4523809523807,
+            "min_solution_bits": 3442,
+            "max_solution_bits": 4191
           },
           "huffman_stats": {
             "num_unique_symbols": 1915,
@@ -111,15 +111,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.042180457996437326,
+      "construction_time_s": 0.02423991599061992,
       "inference_ns": {
-        "mean": 282.48,
-        "median": 250.0,
-        "std": 57.58462989374855,
-        "min": 208.0,
-        "max": 542.0,
-        "p95": 375.0,
-        "p99": 500.4200000000002
+        "mean": 110.85,
+        "median": 125.0,
+        "std": 35.48334116173391,
+        "min": 42.0,
+        "max": 250.0,
+        "p95": 167.0,
+        "p99": 250.0
       },
       "memory": {
         "serialized": 61100,

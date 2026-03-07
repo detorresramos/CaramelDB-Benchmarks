@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.02542820799862966,
+      "construction_time_s": 0.012104624998755753,
       "inference_ns": {
-        "mean": 268.72,
-        "median": 250.0,
-        "std": 63.04840679985498,
-        "min": 167.0,
-        "max": 459.0,
-        "p95": 377.0499999999999,
-        "p99": 458.01
+        "mean": 107.07,
+        "median": 84.0,
+        "std": 40.89162628216199,
+        "min": 41.0,
+        "max": 292.0,
+        "p95": 166.05,
+        "p99": 291.01
       },
       "memory": {
-        "serialized": 29176,
+        "serialized": 29184,
         "csf_stats": {
-          "in_memory_bytes": 28996,
-          "solution_bytes": 20760.0,
+          "in_memory_bytes": 29004,
+          "solution_bytes": 20768.0,
           "filter_bytes": 2976.0,
           "metadata_bytes": 5260.0,
           "bucket_stats": {
             "num_buckets": 60,
-            "total_solution_bits": 164287,
-            "avg_solution_bits": 2738.116666666667,
-            "min_solution_bits": 2447,
-            "max_solution_bits": 3097
+            "total_solution_bits": 164241,
+            "avg_solution_bits": 2737.35,
+            "min_solution_bits": 2448,
+            "max_solution_bits": 3079
           },
           "huffman_stats": {
             "num_unique_symbols": 1041,
@@ -111,15 +111,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.02870904200244695,
+      "construction_time_s": 0.013363083999138325,
       "inference_ns": {
-        "mean": 289.15,
-        "median": 250.0,
-        "std": 75.69417084558097,
-        "min": 208.0,
-        "max": 500.0,
-        "p95": 458.0,
-        "p99": 459.4100000000002
+        "mean": 166.19,
+        "median": 125.0,
+        "std": 95.46399268834297,
+        "min": 83.0,
+        "max": 458.0,
+        "p95": 333.0,
+        "p99": 375.83000000000044
       },
       "memory": {
         "serialized": 30371,
