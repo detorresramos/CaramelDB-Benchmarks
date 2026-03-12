@@ -283,11 +283,13 @@ class LSFBenchmark:
     Only LSFLearned() (competitor="LSF", learned=True) is used as the entry point.
     """
 
-    def __init__(self, competitor="all", learned=False):
+    def __init__(self, competitor="all", learned=False, tokenizer="md5"):
         self.competitor = competitor
         self.learned = learned
+        self.tokenizer = tokenizer
         suffix = "_learned" if learned else ""
-        self.name = f"lsf_{competitor.lower()}{suffix}"
+        tok_suffix = f"_{tokenizer}" if tokenizer != "md5" else ""
+        self.name = f"lsf_{competitor.lower()}{suffix}{tok_suffix}"
 
     def run_full_benchmark(self, keys, values, seed):
         from deps.lsf.run_benchmark import (
@@ -302,6 +304,7 @@ class LSFBenchmark:
                 competitor=self.competitor,
                 seed=seed,
                 learned=self.learned,
+                tokenizer=self.tokenizer,
             )
         else:
             warnings.warn(
@@ -315,11 +318,11 @@ class LSFBenchmark:
 
         if raw is None:
             return None
-        return results_to_json(raw, keys, values, self.competitor)
+        return results_to_json(raw, keys, values, self.competitor, tokenizer=self.tokenizer)
 
     def get_params(self):
-        return {"competitor": self.competitor, "learned": self.learned}
+        return {"competitor": self.competitor, "learned": self.learned, "tokenizer": self.tokenizer}
 
 
-def LSFLearned():
-    return LSFBenchmark("LSF", learned=True)
+def LSFLearned(tokenizer="md5"):
+    return LSFBenchmark("LSF", learned=True, tokenizer=tokenizer)

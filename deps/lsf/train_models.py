@@ -15,6 +15,57 @@ import time
 import numpy as np
 
 
+class GlobalMinEarlyStopping:
+    """Early stopping from the LSF paper (train/train.py lines 14-55).
+
+    Stops training if the global minimum loss hasn't improved by at least
+    `min_improvement_rel` relative to the minimum excluding the last `window` epochs.
+    """
+    def __init__(self, monitor, min_improvement_rel, window):
+        self.monitor = monitor
+        self.min_improvement_rel = min_improvement_rel
+        self.window = window
+        self.losses = []
+        self.model = None
+
+    def set_model(self, model):
+        self.model = model
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        current_loss = logs.get(self.monitor)
+        if current_loss is None:
+            return
+        self.losses.append(current_loss)
+        if len(self.losses) > self.window:
+            global_min = min(self.losses)
+            min_excl_recent = min(self.losses[:-self.window])
+            threshold = min_excl_recent * (1 - self.min_improvement_rel)
+            if global_min >= threshold:
+                print(
+                    f"Stopping at epoch {epoch+1}: global min {global_min:.5f} "
+                    f"not {self.min_improvement_rel*100:.0f}% better than "
+                    f"min before last {self.window} epochs ({min_excl_recent:.5f})"
+                )
+                self.model.stop_training = True
+
+
+def _make_early_stopping_callback(monitor='val_loss'):
+    """Create a Keras callback wrapping GlobalMinEarlyStopping."""
+    import keras
+
+    class _Callback(keras.callbacks.Callback):
+        def __init__(self):
+            super().__init__()
+            self._es = GlobalMinEarlyStopping(monitor, 0.01, 3)
+
+        def on_epoch_end(self, epoch, logs=None):
+            self._es.set_model(self.model)
+            self._es.on_epoch_end(epoch, logs)
+
+    return _Callback()
+
+
 def read_lrbin(data_dir, dataset_name):
     """Read .lrbin feature and label files."""
     x_path = os.path.join(data_dir, f"{dataset_name}_X.lrbin")
@@ -48,7 +99,8 @@ def train_and_export(data_dir, dataset_name, X_train, X_test, y_train, y_test,
     import tensorflow as tf
     import keras
 
-    tf.config.set_visible_devices([], "GPU")
+    if os.environ.get("LSF_FORCE_CPU"):
+        tf.config.set_visible_devices([], "GPU")
     keras.utils.set_random_seed(42)
 
     model_name = f"{dataset_name}_mlp_L{num_layers}_H{hidden_units}"
@@ -81,9 +133,7 @@ def train_and_export(data_dir, dataset_name, X_train, X_test, y_train, y_test,
     print(f"Training {filename}...")
     model.summary()
 
-    early_stop = keras.callbacks.EarlyStopping(
-        monitor="val_loss", patience=10, restore_best_weights=True,
-    )
+    early_stop = _make_early_stopping_callback('val_loss')
 
     t0 = time.perf_counter()
     model.fit(
@@ -103,14 +153,22 @@ def train_and_export(data_dir, dataset_name, X_train, X_test, y_train, y_test,
     keras_path = os.path.join(model_dir, f"{filename}.keras")
     model.save(keras_path)
 
-    # Export TFLite (float16 quantization)
-    for quantization in ["float16"]:
+    def representative_dataset():
+        for x in X_train[:1000]:
+            yield {"input": x.reshape(1, -1)}
+
+    # Export TFLite (uint8, float16, float32 — matching LSF paper)
+    for quantization in ["uint8", "float16", "float32"]:
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
         converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
         converter.inference_input_type = tf.float32
         converter.inference_output_type = tf.float32
-        converter.target_spec.supported_types = [tf.float16]
+        if quantization == "uint8":
+            converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+            converter.representative_dataset = representative_dataset
+        elif quantization == "float16":
+            converter.target_spec.supported_types = [tf.float16]
 
         tflite_model = converter.convert()
         tflite_path = os.path.join(model_dir, f"{filename}_{quantization}.tflite")
@@ -176,9 +234,7 @@ def main():
         X, y, test_size=0.2, random_state=42, stratify=stratify
     )
 
-    # Train model architectures. With random-hash features, complex models
-    # can't outperform logistic regression, so L0_H0 is sufficient.
-    for num_layers, hidden_units in [(0, 0)]:
+    for num_layers, hidden_units in [(0, 0), (1, 50), (1, 100), (2, 50)]:
         print(f"\n{'='*60}")
         print(f"Architecture: L={num_layers}, H={hidden_units}")
         print(f"{'='*60}")

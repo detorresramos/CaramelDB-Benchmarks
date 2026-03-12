@@ -28,15 +28,15 @@
     },
     {
       "method": "cpp_hash_table",
-      "construction_time_s": 0.006665375010925345,
+      "construction_time_s": 0.006755958995199762,
       "inference_ns": {
-        "mean": 902.11,
-        "median": 312.5,
-        "std": 3461.052475461763,
-        "min": 208.0,
-        "max": 25250.0,
-        "p95": 1060.699999999999,
-        "p99": 24755.000000000004
+        "mean": 156.575,
+        "median": 125.0,
+        "std": 192.74463254524105,
+        "min": 41.0,
+        "max": 18042.0,
+        "p95": 292.0,
+        "p99": 375.0
       },
       "memory": {
         "theoretical": 1188890
@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.007480291998945177,
+      "construction_time_s": 0.012699749990133569,
       "inference_ns": {
-        "mean": 88.17,
-        "median": 84.0,
-        "std": 32.62209527298944,
-        "min": 42.0,
-        "max": 167.0,
-        "p95": 166.0,
+        "mean": 77.9848,
+        "median": 83.0,
+        "std": 29.755879569590945,
+        "min": 41.0,
+        "max": 292.0,
+        "p95": 125.0,
         "p99": 167.0
       },
       "memory": {
-        "serialized": 10088,
+        "serialized": 10048,
         "csf_stats": {
-          "in_memory_bytes": 9908,
-          "solution_bytes": 6120.0,
+          "in_memory_bytes": 9868,
+          "solution_bytes": 6080.0,
           "filter_bytes": 3136.0,
           "metadata_bytes": 652.0,
           "bucket_stats": {
             "num_buckets": 12,
-            "total_solution_bits": 48506,
-            "avg_solution_bits": 4042.1666666666665,
-            "min_solution_bits": 3868,
-            "max_solution_bits": 4292
+            "total_solution_bits": 48279,
+            "avg_solution_bits": 4023.25,
+            "min_solution_bits": 3857,
+            "max_solution_bits": 4217
           },
           "huffman_stats": {
             "num_unique_symbols": 101,
@@ -103,15 +103,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.0077337499969871715,
+      "construction_time_s": 0.007706958000198938,
       "inference_ns": {
-        "mean": 94.05,
-        "median": 83.0,
-        "std": 37.047368327588394,
+        "mean": 86.9968,
+        "median": 84.0,
+        "std": 31.53019488934377,
         "min": 41.0,
-        "max": 333.0,
-        "p95": 127.04999999999988,
-        "p99": 209.25000000000063
+        "max": 416.0,
+        "p95": 125.0,
+        "p99": 208.0
       },
       "memory": {
         "serialized": 10519,
@@ -199,46 +199,10 @@
       "filter_type": null
     },
     {
-      "method": "lsf_burr_burr",
-      "construction_time_s": 0.009028874999999999,
-      "inference_ns": {
-        "mean": 18.668297
-      },
-      "memory": {
-        "serialized_bytes": 88591,
-        "bits_per_key": 7.08728,
-        "model_bits_per_key": 0
-      },
-      "filter_params": {
-        "competitor": "BuRR",
-        "storage": "BuRR",
-        "cross_entropy_bits_per_key": null
-      },
-      "filter_type": null
-    },
-    {
-      "method": "lsf_ourcsf_filtered-huffmancsf_opt",
-      "construction_time_s": 0.019272958,
-      "inference_ns": {
-        "mean": 50.025753
-      },
-      "memory": {
-        "serialized_bytes": 8263,
-        "bits_per_key": 0.66104,
-        "model_bits_per_key": 0.03232
-      },
-      "filter_params": {
-        "competitor": "ourCSF",
-        "storage": "Filtered-HuffmanCSF_Opt",
-        "cross_entropy_bits_per_key": null
-      },
-      "filter_type": null
-    },
-    {
       "method": "lsf_ours_filtered-huffman_opt",
-      "construction_time_s": 5.733066834013387,
+      "construction_time_s": 9.348309458994823,
       "inference_ns": {
-        "mean": 3199
+        "mean": 3779
       },
       "memory": {
         "serialized": 8997,
@@ -248,7 +212,9 @@
       "filter_params": {
         "competitor": "ours",
         "storage": "Filtered-Huffman_Opt",
-        "cross_entropy_bits_per_key": 0.617017
+        "cross_entropy_bits_per_key": 1.625698,
+        "best_model": "L0_H0_uint8",
+        "num_models_evaluated": 12
       },
       "filter_type": null
     }

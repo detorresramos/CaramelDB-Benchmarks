@@ -47,7 +47,7 @@ DATA_DIR = os.path.join(FIGURES_DIR, "data")
 
 DEFAULT_SEED = 42
 DEFAULT_FILTER_TYPE = "binary_fuse"
-NUM_INFERENCE_QUERIES = 100
+NUM_INFERENCE_QUERIES = 10_000
 
 SWEEP_NS = [100_000, 1_000_000, 10_000_000]
 SWEEP_ALPHAS = [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99]
@@ -158,7 +158,8 @@ def load_dataset(path):
 
 
 def run_experiment(
-    n, alpha, minority_dist, seed, filter_type, methods=None, keys=None, values=None
+    n, alpha, minority_dist, seed, filter_type, methods=None, keys=None, values=None,
+    tokenizer="md5",
 ):
     if methods is None:
         methods = ALL_METHODS
@@ -209,7 +210,7 @@ def run_experiment(
         _print_result_summary(result)
 
     if "learned_csf" in methods:
-        lsf_learned = LSFLearned()
+        lsf_learned = LSFLearned(tokenizer=tokenizer)
         num_classes = len(np.unique(values))
         if num_classes <= 500:
             est = "~2-5min"
@@ -314,6 +315,12 @@ def parse_args():
         help="Filter type for CSF methods",
     )
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED, help="Random seed")
+    parser.add_argument(
+        "--tokenizer",
+        choices=["md5", "kmer_ordinal", "kmer_onehot"],
+        default=None,
+        help="Tokenizer for learned CSF. For genomics datasets, omit to auto-sweep all 3.",
+    )
     return parser.parse_args()
 
 
@@ -326,24 +333,39 @@ def main():
         alpha = float(compute_actual_alpha(values))
         n = len(keys)
         dataset_name = os.path.splitext(os.path.basename(args.dataset))[0]
-        print(
-            f"\n=== dataset={args.dataset}, n={n}, alpha={alpha:.4f}, filter={args.filter_type} ==="
-        )
 
-        data = run_experiment(
-            n,
-            alpha,
-            "custom",
-            args.seed,
-            args.filter_type,
-            methods=args.method,
-            keys=keys,
-            values=values,
-        )
-        data["dataset"]["source"] = args.dataset
+        # Determine tokenizer list: auto-sweep for genomics learned_csf, else single
+        is_learned = args.method and "learned_csf" in args.method
+        if args.tokenizer is not None:
+            tokenizer_list = [args.tokenizer]
+        elif is_learned:
+            tokenizer_list = ["md5", "kmer_ordinal", "kmer_onehot"]
+        else:
+            tokenizer_list = ["md5"]
 
-        filename = f"baselines_{dataset_name}_{args.filter_type}.json"
-        save_json(data, os.path.join(DATA_DIR, filename))
+        for tok in tokenizer_list:
+            tok_suffix = f"_{tok}" if tok != "md5" else ""
+            print(
+                f"\n=== dataset={args.dataset}, n={n}, alpha={alpha:.4f}, "
+                f"filter={args.filter_type}, tokenizer={tok} ==="
+            )
+
+            data = run_experiment(
+                n,
+                alpha,
+                "custom",
+                args.seed,
+                args.filter_type,
+                methods=args.method,
+                keys=keys,
+                values=values,
+                tokenizer=tok,
+            )
+            data["dataset"]["source"] = args.dataset
+            data["dataset"]["tokenizer"] = tok
+
+            filename = f"baselines_{dataset_name}_{args.filter_type}{tok_suffix}.json"
+            save_json(data, os.path.join(DATA_DIR, filename))
         return
 
     ns = args.n if args.n is not None else SWEEP_NS
@@ -375,7 +397,8 @@ def main():
 
         config_t0 = time.perf_counter()
         data = run_experiment(
-            n, alpha, dist, args.seed, args.filter_type, methods=args.method
+            n, alpha, dist, args.seed, args.filter_type, methods=args.method,
+            tokenizer="md5",
         )
         config_elapsed = time.perf_counter() - config_t0
         elapsed_times.append(config_elapsed)

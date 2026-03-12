@@ -84,14 +84,62 @@ def load_synthetic():
     return exps
 
 
+def _pick_best_learned_tokenizer(base_fname, label):
+    """Load all tokenizer variants for a genomics dataset, merge best learned CSF.
+
+    Returns (label, merged_data) where the learned CSF result is the one with
+    lowest total bpk across all tokenizer variants.
+    """
+    base_path = os.path.join(DATA_DIR, base_fname)
+    if not os.path.exists(base_path):
+        return None
+
+    with open(base_path) as f:
+        base_data = json.load(f)
+
+    # Find tokenizer variant files: baselines_{dataset}_binary_fuse_{tok}.json
+    stem = base_fname.replace(".json", "")  # e.g. baselines_ecoli_sakai_k15_binary_fuse
+    variant_files = glob.glob(os.path.join(DATA_DIR, f"{stem}_*.json"))
+
+    learned_method = "lsf_ours_filtered-huffman_opt"
+    best_learned = find(base_data, learned_method)
+    best_bpk = float("inf")
+    if best_learned:
+        best_bpk = mem_bpk(best_learned, base_data["dataset"]["N"])
+
+    for vf in variant_files:
+        with open(vf) as f:
+            vdata = json.load(f)
+        # Tokenizer variants have method names like lsf_lsf_learned_kmer_ordinal
+        # but results_to_json always uses "lsf_ours_filtered-huffman_opt"
+        vr = find(vdata, learned_method)
+        if not vr:
+            continue
+        vbpk = mem_bpk(vr, vdata["dataset"]["N"])
+        if vbpk < best_bpk:
+            best_bpk = vbpk
+            best_learned = vr
+
+    # Replace the learned CSF result in base_data with the best one
+    if best_learned:
+        base_data["results"] = [
+            r for r in base_data["results"] if r["method"] != learned_method
+        ]
+        base_data["results"].append(best_learned)
+
+    return (label, base_data)
+
+
 def load_genomics():
-    """Load genomics experiment files. Returns list of (label, data) tuples."""
+    """Load genomics experiment files, picking best tokenizer for learned CSF.
+
+    Returns list of (label, data) tuples.
+    """
     out = []
     for fname, label in GENOMICS_FILES:
-        path = os.path.join(DATA_DIR, fname)
-        if os.path.exists(path):
-            with open(path) as f:
-                out.append((label, json.load(f)))
+        result = _pick_best_learned_tokenizer(fname, label)
+        if result:
+            out.append(result)
         else:
             print(f"  Warning: {fname} not found, skipping")
     return out

@@ -29,14 +29,15 @@ _LSF_BUILD_DIR = os.path.normpath(os.path.join(_dir, "..", "LearnedStaticFunctio
 _NATIVE_BENCH_BIN = os.path.join(_LSF_BUILD_DIR, "ribbon_learned_bench")
 
 
-def _cache_key(keys, values):
-    """Hash dataset to create a stable cache key."""
+def _cache_key(keys, values, tokenizer="md5"):
+    """Hash dataset + tokenizer to create a stable cache key."""
     h = hashlib.sha256()
     h.update(str(len(keys)).encode())
     h.update(keys[0].encode())
     h.update(keys[-1].encode())
     h.update(np.array(values, dtype=np.uint32).tobytes()[:4096])
     h.update(np.array(values, dtype=np.uint32).tobytes()[-4096:])
+    h.update(tokenizer.encode())
     return h.hexdigest()[:16]
 
 
@@ -109,7 +110,7 @@ def _native_bench_available():
     return os.path.isfile(_NATIVE_BENCH_BIN)
 
 
-def run_lsf_native(keys, values, competitor="all", seed=42, learned=False):
+def run_lsf_native(keys, values, competitor="all", seed=42, learned=False, tokenizer="md5"):
     """Run LSF benchmark natively.
 
     Args:
@@ -118,6 +119,7 @@ def run_lsf_native(keys, values, competitor="all", seed=42, learned=False):
         competitor: "CSF", "BuRR", "LSF", or "all"
         seed: random seed
         learned: if True, train models locally first
+        tokenizer: feature extractor ("md5", "kmer_ordinal", "kmer_onehot")
 
     Returns list of parsed result dicts, one per competitor/storage combo.
     """
@@ -126,10 +128,10 @@ def run_lsf_native(keys, values, competitor="all", seed=42, learned=False):
         os.makedirs(data_dir)
 
         output_prefix = os.path.join(data_dir, DATASET_NAME)
-        write_lrbin(keys, values, output_prefix)
+        write_lrbin(keys, values, output_prefix, tokenizer=tokenizer)
 
         if learned:
-            cache_dir = os.path.join(MODEL_CACHE_DIR, _cache_key(keys, values))
+            cache_dir = os.path.join(MODEL_CACHE_DIR, _cache_key(keys, values, tokenizer=tokenizer))
             if not _restore_from_cache(cache_dir, data_dir, DATASET_NAME):
                 if not _train_models_locally(data_dir, DATASET_NAME):
                     return None
@@ -165,27 +167,98 @@ def run_lsf_native(keys, values, competitor="all", seed=42, learned=False):
         return results
 
 
-def results_to_json(results, keys, values, competitor):
+def results_to_json(results, keys, values, competitor, tokenizer="md5"):
     """Convert parsed results to our standard JSON format.
 
-    For learned results (comp=ours), only keeps Filtered-Huffman_Opt
-    (the canonical variant from the LSF paper).
+    For learned results (comp=ours), picks the best model (lowest total bpk)
+    from all Filtered-Huffman_Opt entries. Construction time = sum of all
+    training times + ribbon construction time of the best model.
     """
     if not results:
         return None
 
-    out = []
+    # Separate ours (LSF learned) from other competitors
+    ours_candidates = []
+    other_results = []
     for r in results:
         comp = r.get("comp", competitor)
         storage = r.get("storage_name", "unknown")
+        if comp == "ours" and storage == "Filtered-Huffman_Opt":
+            ours_candidates.append(r)
+        elif comp != "ours":
+            other_results.append(r)
 
-        # Only keep the canonical learned variant
-        if comp == "ours" and storage != "Filtered-Huffman_Opt":
-            continue
+    out = []
 
+    # Pick best learned model by lowest total bpk
+    if ours_candidates:
+        # Deduplicate training time by architecture (each arch has 3 quantizations
+        # that share the same training_seconds)
+        seen_archs = {}
+        for r in ours_candidates:
+            arch_key = (r.get("model_l"), r.get("model_h"))
+            if arch_key not in seen_archs:
+                seen_archs[arch_key] = r.get("training_seconds", 0)
+        total_training_seconds = sum(seen_archs.values())
+        best = min(
+            ours_candidates,
+            key=lambda r: r.get("storage_bits", 0) + r.get("model_bits", 0),
+        )
+        comp = best.get("comp", competitor)
+        storage = best.get("storage_name", "unknown")
         name = f"lsf_{comp}_{storage}".lower().replace(" ", "_")
 
-        entry = {
+        # Build full per-model data for reproducibility
+        all_models = []
+        for r in ours_candidates:
+            all_models.append({
+                "arch": f"L{r.get('model_l', '?')}_H{r.get('model_h', '?')}",
+                "quant": r.get("quant", "?"),
+                "storage_bpk": r.get("storage_bits", 0),
+                "model_bpk": r.get("model_bits", 0),
+                "total_bpk": r.get("storage_bits", 0) + r.get("model_bits", 0),
+                "training_seconds": r.get("training_seconds", 0),
+                "cross_entropy_bpk": r.get("cross_entropy_bit_per_key"),
+                "query_nanos": r.get("query_nanos", 0),
+                "construct_ms": r.get("construct_ms", 0),
+            })
+
+        out.append({
+            "method": name,
+            "construction_time_s": (
+                best.get("construct_ms", 0) / 1000.0
+                + total_training_seconds
+            ),
+            "inference_ns": {
+                "mean": best.get("query_nanos", 0),
+            },
+            "memory": {
+                "serialized": int(
+                    (best.get("storage_bits", 0) + best.get("model_bits", 0))
+                    * len(keys) / 8
+                ),
+                "bits_per_key": best.get("storage_bits", 0),
+                "model_bits_per_key": best.get("model_bits", 0),
+            },
+            "filter_params": {
+                "competitor": comp,
+                "storage": storage,
+                "tokenizer": tokenizer,
+                "cross_entropy_bits_per_key": best.get(
+                    "cross_entropy_bit_per_key"
+                ),
+                "best_model": f"L{best.get('model_l', '?')}_H{best.get('model_h', '?')}_{best.get('quant', '?')}",
+                "num_models_evaluated": len(ours_candidates),
+                "all_models": all_models,
+            },
+        })
+
+    # Pass through non-ours results as before
+    for r in other_results:
+        comp = r.get("comp", competitor)
+        storage = r.get("storage_name", "unknown")
+        name = f"lsf_{comp}_{storage}".lower().replace(" ", "_")
+        out.append({
             "method": name,
             "construction_time_s": (
                 r.get("construct_ms", 0) / 1000.0
@@ -209,8 +282,7 @@ def results_to_json(results, keys, values, competitor):
                     "cross_entropy_bit_per_key"
                 ),
             },
-        }
-        out.append(entry)
+        })
 
     return out
 
@@ -241,7 +313,7 @@ def main():
         sys.exit(1)
     results = run_lsf_native(keys, values, args.competitor, learned=args.learned)
     if results:
-        converted = results_to_json(results, keys, values, args.competitor)
+        converted = results_to_json(results, keys, values, args.competitor, tokenizer="md5")
         print(json.dumps(converted, indent=2))
     else:
         print("No results")

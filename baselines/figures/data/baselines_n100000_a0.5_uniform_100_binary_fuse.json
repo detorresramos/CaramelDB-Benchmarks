@@ -28,15 +28,15 @@
     },
     {
       "method": "cpp_hash_table",
-      "construction_time_s": 0.00699304100999143,
+      "construction_time_s": 0.006492792002973147,
       "inference_ns": {
-        "mean": 278.69,
-        "median": 250.0,
-        "std": 63.42266077672869,
-        "min": 166.0,
-        "max": 459.0,
-        "p95": 377.0999999999999,
-        "p99": 458.01
+        "mean": 150.0127,
+        "median": 125.0,
+        "std": 84.49713923388174,
+        "min": 41.0,
+        "max": 6167.0,
+        "p95": 250.0,
+        "p99": 333.0
       },
       "memory": {
         "theoretical": 1188890
@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.04652816599991638,
+      "construction_time_s": 0.02951783400203567,
       "inference_ns": {
-        "mean": 133.72,
-        "median": 125.0,
-        "std": 36.43873762906723,
-        "min": 83.0,
-        "max": 375.0,
-        "p95": 167.0,
-        "p99": 251.25000000000063
+        "mean": 91.8858,
+        "median": 84.0,
+        "std": 25.804006633854364,
+        "min": 0.0,
+        "max": 334.0,
+        "p95": 125.0,
+        "p99": 167.0
       },
       "memory": {
-        "serialized": 65271,
+        "serialized": 65303,
         "csf_stats": {
-          "in_memory_bytes": 65091,
-          "solution_bytes": 55520.0,
+          "in_memory_bytes": 65123,
+          "solution_bytes": 55552.0,
           "filter_bytes": 7168.0,
           "metadata_bytes": 2403.0,
           "bucket_stats": {
             "num_buckets": 115,
-            "total_solution_bits": 440748,
-            "avg_solution_bits": 3832.5913043478263,
-            "min_solution_bits": 3448,
-            "max_solution_bits": 4204
+            "total_solution_bits": 440641,
+            "avg_solution_bits": 3831.6608695652176,
+            "min_solution_bits": 3469,
+            "max_solution_bits": 4194
           },
           "huffman_stats": {
             "num_unique_symbols": 101,
@@ -103,15 +103,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.029046582989394665,
+      "construction_time_s": 0.028098166003474034,
       "inference_ns": {
-        "mean": 108.27,
-        "median": 125.0,
-        "std": 29.513337662826277,
-        "min": 42.0,
-        "max": 209.0,
-        "p95": 166.05,
-        "p99": 208.01
+        "mean": 95.0506,
+        "median": 84.0,
+        "std": 30.451381571941855,
+        "min": 0.0,
+        "max": 375.0,
+        "p95": 125.0,
+        "p99": 208.0
       },
       "memory": {
         "serialized": 69027,
@@ -199,46 +199,10 @@
       "filter_type": null
     },
     {
-      "method": "lsf_burr_burr",
-      "construction_time_s": 0.008837208000000001,
-      "inference_ns": {
-        "mean": 18.608429
-      },
-      "memory": {
-        "serialized_bytes": 88591,
-        "bits_per_key": 7.08728,
-        "model_bits_per_key": 0
-      },
-      "filter_params": {
-        "competitor": "BuRR",
-        "storage": "BuRR",
-        "cross_entropy_bits_per_key": null
-      },
-      "filter_type": null
-    },
-    {
-      "method": "lsf_ourcsf_filtered-huffmancsf_opt",
-      "construction_time_s": 0.06875608300000001,
-      "inference_ns": {
-        "mean": 52.258372
-      },
-      "memory": {
-        "serialized_bytes": 54813,
-        "bits_per_key": 4.38504,
-        "model_bits_per_key": 0.03232
-      },
-      "filter_params": {
-        "competitor": "ourCSF",
-        "storage": "Filtered-HuffmanCSF_Opt",
-        "cross_entropy_bits_per_key": null
-      },
-      "filter_type": null
-    },
-    {
       "method": "lsf_ours_filtered-huffman_opt",
-      "construction_time_s": 5.173388332996181,
+      "construction_time_s": 6.977409707959933,
       "inference_ns": {
-        "mean": 6435
+        "mean": 6153
       },
       "memory": {
         "serialized": 55418,
@@ -248,7 +212,144 @@
       "filter_params": {
         "competitor": "ours",
         "storage": "Filtered-Huffman_Opt",
-        "cross_entropy_bits_per_key": 4.32065
+        "tokenizer": "md5",
+        "cross_entropy_bits_per_key": 4.32065,
+        "best_model": "L0_H0_float16",
+        "num_models_evaluated": 12,
+        "all_models": [
+          {
+            "arch": "L1_H100",
+            "quant": "uint8",
+            "storage_bpk": 4.39528,
+            "model_bpk": 0.88832,
+            "total_bpk": 5.2836,
+            "training_seconds": 1.2828723749844357,
+            "cross_entropy_bpk": 4.447019,
+            "query_nanos": 3886,
+            "construct_ms": 835.81
+          },
+          {
+            "arch": "L2_H50",
+            "quant": "float16",
+            "storage_bpk": 4.39528,
+            "model_bpk": 1.25616,
+            "total_bpk": 5.651439999999999,
+            "training_seconds": 1.3605427499860525,
+            "cross_entropy_bpk": 4.324809,
+            "query_nanos": 6354,
+            "construct_ms": 1280.452
+          },
+          {
+            "arch": "L2_H50",
+            "quant": "float32",
+            "storage_bpk": 4.39528,
+            "model_bpk": 0.70032,
+            "total_bpk": 5.095599999999999,
+            "training_seconds": 1.3605427499860525,
+            "cross_entropy_bpk": 4.32475,
+            "query_nanos": 7325,
+            "construct_ms": 1381.88
+          },
+          {
+            "arch": "L0_H0",
+            "quant": "uint8",
+            "storage_bpk": 4.40552,
+            "model_bpk": 0.04848,
+            "total_bpk": 4.454,
+            "training_seconds": 1.927699958003359,
+            "cross_entropy_bpk": 4.493077,
+            "query_nanos": 3512,
+            "construct_ms": 748.005
+          },
+          {
+            "arch": "L1_H50",
+            "quant": "uint8",
+            "storage_bpk": 4.39528,
+            "model_bpk": 0.46032,
+            "total_bpk": 4.8556,
+            "training_seconds": 1.169950624986086,
+            "cross_entropy_bpk": 4.452547,
+            "query_nanos": 3547,
+            "construct_ms": 773.502
+          },
+          {
+            "arch": "L0_H0",
+            "quant": "float32",
+            "storage_bpk": 4.39528,
+            "model_bpk": 0.09696,
+            "total_bpk": 4.49224,
+            "training_seconds": 1.927699958003359,
+            "cross_entropy_bpk": 4.32065,
+            "query_nanos": 5972,
+            "construct_ms": 1228.302
+          },
+          {
+            "arch": "L1_H100",
+            "quant": "float32",
+            "storage_bpk": 4.38504,
+            "model_bpk": 0.93632,
+            "total_bpk": 5.32136,
+            "training_seconds": 1.2828723749844357,
+            "cross_entropy_bpk": 4.323815,
+            "query_nanos": 6694,
+            "construct_ms": 1330.079
+          },
+          {
+            "arch": "L1_H100",
+            "quant": "float16",
+            "storage_bpk": 4.39528,
+            "model_bpk": 1.68016,
+            "total_bpk": 6.0754399999999995,
+            "training_seconds": 1.2828723749844357,
+            "cross_entropy_bpk": 4.323835,
+            "query_nanos": 6453,
+            "construct_ms": 1292.754
+          },
+          {
+            "arch": "L0_H0",
+            "quant": "float16",
+            "storage_bpk": 4.38504,
+            "model_bpk": 0.04848,
+            "total_bpk": 4.43352,
+            "training_seconds": 1.927699958003359,
+            "cross_entropy_bpk": 4.32065,
+            "query_nanos": 6153,
+            "construct_ms": 1236.344
+          },
+          {
+            "arch": "L1_H50",
+            "quant": "float16",
+            "storage_bpk": 4.38504,
+            "model_bpk": 0.84816,
+            "total_bpk": 5.2332,
+            "training_seconds": 1.169950624986086,
+            "cross_entropy_bpk": 4.32372,
+            "query_nanos": 6439,
+            "construct_ms": 1289.936
+          },
+          {
+            "arch": "L2_H50",
+            "quant": "uint8",
+            "storage_bpk": 4.41224,
+            "model_bpk": 0.67632,
+            "total_bpk": 5.088559999999999,
+            "training_seconds": 1.3605427499860525,
+            "cross_entropy_bpk": 4.455271,
+            "query_nanos": 4116,
+            "construct_ms": 827.735
+          },
+          {
+            "arch": "L1_H50",
+            "quant": "float32",
+            "storage_bpk": 4.38504,
+            "model_bpk": 0.48432,
+            "total_bpk": 4.86936,
+            "training_seconds": 1.169950624986086,
+            "cross_entropy_bpk": 4.323706,
+            "query_nanos": 6569,
+            "construct_ms": 1346.667
+          }
+        ]
       },
       "filter_type": null
     }

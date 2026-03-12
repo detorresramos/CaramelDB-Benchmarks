@@ -16,12 +16,11 @@ import hashlib
 import numpy as np
 
 
-def keys_to_features(keys):
-    """Hash string keys to float32 features in [0, 1).
+CHAR_MAP = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
 
-    Uses two hash functions to produce 2 float features per key.
-    The features have no learnable structure (by design — this is the point).
-    """
+
+def md5_features(keys):
+    """MD5 hash → 2 random floats. No learnable structure."""
     features = np.zeros((len(keys), 2), dtype=np.float32)
     for i, key in enumerate(keys):
         h = hashlib.md5(key.encode()).digest()
@@ -30,13 +29,44 @@ def keys_to_features(keys):
     return features
 
 
-def write_lrbin(keys, values, output_prefix):
+# Backward compat alias
+keys_to_features = md5_features
+
+
+def kmer_ordinal_features(keys):
+    """Ordinal encode each k-mer position: {A,C,G,T} → {0,1,2,3}/3. Returns (n, k) features."""
+    k = len(keys[0])
+    features = np.zeros((len(keys), k), dtype=np.float32)
+    for i, key in enumerate(keys):
+        for j, ch in enumerate(key):
+            features[i, j] = CHAR_MAP.get(ch, 0) / 3.0
+    return features
+
+
+def kmer_onehot_features(keys):
+    """One-hot encode each position: 4 bits per char. Returns (n, 4*k) features."""
+    k = len(keys[0])
+    features = np.zeros((len(keys), 4 * k), dtype=np.float32)
+    for i, key in enumerate(keys):
+        for j, ch in enumerate(key):
+            features[i, 4 * j + CHAR_MAP.get(ch, 0)] = 1.0
+    return features
+
+
+TOKENIZERS = {
+    "md5": md5_features,
+    "kmer_ordinal": kmer_ordinal_features,
+    "kmer_onehot": kmer_onehot_features,
+}
+
+
+def write_lrbin(keys, values, output_prefix, tokenizer="md5"):
     """Write keys/values in LSF's .lrbin format.
 
     X file: [num_examples: uint64] [num_features: uint64] [float32 data...]
     y file: [num_classes: uint16] [uint16 labels...]
     """
-    features = keys_to_features(keys)
+    features = TOKENIZERS[tokenizer](keys)
     num_examples, num_features = features.shape
 
     unique_values = np.unique(values)

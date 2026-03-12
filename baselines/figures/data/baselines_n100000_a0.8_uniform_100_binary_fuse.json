@@ -28,15 +28,15 @@
     },
     {
       "method": "cpp_hash_table",
-      "construction_time_s": 0.007140292000258341,
+      "construction_time_s": 0.00594049999199342,
       "inference_ns": {
-        "mean": 357.15,
-        "median": 354.5,
-        "std": 70.48437770172906,
-        "min": 208.0,
-        "max": 541.0,
-        "p95": 500.0,
-        "p99": 500.4100000000002
+        "mean": 121.41,
+        "median": 125.0,
+        "std": 95.73807654219924,
+        "min": 41.0,
+        "max": 5875.0,
+        "p95": 167.0,
+        "p99": 250.0
       },
       "memory": {
         "theoretical": 1188890
@@ -46,29 +46,29 @@
     },
     {
       "method": "csf_filter_optimal_binary_fuse",
-      "construction_time_s": 0.014192874994478188,
+      "construction_time_s": 0.030363040990778245,
       "inference_ns": {
-        "mean": 97.13,
-        "median": 84.0,
-        "std": 29.452556765075595,
-        "min": 42.0,
-        "max": 209.0,
-        "p95": 125.0,
-        "p99": 208.01
+        "mean": 115.7237,
+        "median": 125.0,
+        "std": 41.49169987250462,
+        "min": 41.0,
+        "max": 750.0,
+        "p95": 208.0,
+        "p99": 250.0
       },
       "memory": {
-        "serialized": 31393,
+        "serialized": 31280,
         "csf_stats": {
-          "in_memory_bytes": 31213,
-          "solution_bytes": 26752.0,
+          "in_memory_bytes": 31100,
+          "solution_bytes": 26656.0,
           "filter_bytes": 2976.0,
-          "metadata_bytes": 1485.0,
+          "metadata_bytes": 1468.0,
           "bucket_stats": {
-            "num_buckets": 61,
-            "total_solution_bits": 211882,
-            "avg_solution_bits": 3473.4754098360654,
-            "min_solution_bits": 2973,
-            "max_solution_bits": 3795
+            "num_buckets": 60,
+            "total_solution_bits": 211409,
+            "avg_solution_bits": 3523.483333333333,
+            "min_solution_bits": 2998,
+            "max_solution_bits": 3811
           },
           "huffman_stats": {
             "num_unique_symbols": 101,
@@ -103,15 +103,15 @@
     },
     {
       "method": "csf_filter_shibuya_bloom",
-      "construction_time_s": 0.014454417003435083,
+      "construction_time_s": 0.020382625007187016,
       "inference_ns": {
-        "mean": 97.92,
+        "mean": 120.3756,
         "median": 84.0,
-        "std": 30.813529495986007,
+        "std": 49.06724288810204,
         "min": 41.0,
-        "max": 250.0,
-        "p95": 166.0,
-        "p99": 167.83000000000044
+        "max": 500.0,
+        "p95": 209.0,
+        "p99": 250.0
       },
       "memory": {
         "serialized": 34066,
@@ -199,46 +199,10 @@
       "filter_type": null
     },
     {
-      "method": "lsf_burr_burr",
-      "construction_time_s": 0.009049125,
-      "inference_ns": {
-        "mean": 18.504688
-      },
-      "memory": {
-        "serialized_bytes": 88591,
-        "bits_per_key": 7.08728,
-        "model_bits_per_key": 0
-      },
-      "filter_params": {
-        "competitor": "BuRR",
-        "storage": "BuRR",
-        "cross_entropy_bits_per_key": null
-      },
-      "filter_type": null
-    },
-    {
-      "method": "lsf_ourcsf_filtered-huffmancsf_opt",
-      "construction_time_s": 0.044674626,
-      "inference_ns": {
-        "mean": 46.740595
-      },
-      "memory": {
-        "serialized_bytes": 32227,
-        "bits_per_key": 2.57816,
-        "model_bits_per_key": 0.03232
-      },
-      "filter_params": {
-        "competitor": "ourCSF",
-        "storage": "Filtered-HuffmanCSF_Opt",
-        "cross_entropy_bits_per_key": null
-      },
-      "filter_type": null
-    },
-    {
       "method": "lsf_ours_filtered-huffman_opt",
-      "construction_time_s": 5.480492790999731,
+      "construction_time_s": 8.562273999995734,
       "inference_ns": {
-        "mean": 6160
+        "mean": 6708
       },
       "memory": {
         "serialized": 27732,
@@ -248,61 +212,9 @@
       "filter_params": {
         "competitor": "ours",
         "storage": "Filtered-Huffman_Opt",
-        "cross_entropy_bits_per_key": 2.04941
-      },
-      "filter_type": null
-    },
-    {
-      "method": "lsf_ours_filtered-fano_opt",
-      "construction_time_s": 0.321719583,
-      "inference_ns": {
-        "mean": 1462.311908
-      },
-      "memory": {
-        "serialized_bytes": 27588,
-        "bits_per_key": 2.20704,
-        "model_bits_per_key": 0.04848
-      },
-      "filter_params": {
-        "competitor": "ours",
-        "storage": "Filtered-Fano_Opt",
-        "cross_entropy_bits_per_key": 2.049253
-      },
-      "filter_type": null
-    },
-    {
-      "method": "lsf_ours_filtered-fano50_opt",
-      "construction_time_s": 0.16821854200000003,
-      "inference_ns": {
-        "mean": 764.838377
-      },
-      "memory": {
-        "serialized_bytes": 27588,
-        "bits_per_key": 2.20704,
-        "model_bits_per_key": 0.04848
-      },
-      "filter_params": {
-        "competitor": "ours",
-        "storage": "Filtered-Fano50_Opt",
-        "cross_entropy_bits_per_key": 2.049253
-      },
-      "filter_type": null
-    },
-    {
-      "method": "lsf_ours_filtered-fano50_root_opt",
-      "construction_time_s": 0.168379708,
-      "inference_ns": {
-        "mean": 753.150297
-      },
-      "memory": {
-        "serialized_bytes": 27505,
-        "bits_per_key": 2.2004,
-        "model_bits_per_key": 0.04848
-      },
-      "filter_params": {
-        "competitor": "ours",
-        "storage": "Filtered-Fano50_Root_Opt",
-        "cross_entropy_bits_per_key": 2.049253
+        "cross_entropy_bits_per_key": 2.04941,
+        "best_model": "L0_H0_float16",
+        "num_models_evaluated": 12
       },
       "filter_type": null
     }
