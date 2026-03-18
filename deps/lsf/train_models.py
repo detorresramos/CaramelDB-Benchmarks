@@ -157,8 +157,8 @@ def train_and_export(data_dir, dataset_name, X_train, X_test, y_train, y_test,
         for x in X_train[:1000]:
             yield {"input": x.reshape(1, -1)}
 
-    # Export TFLite (uint8, float16, float32 — matching LSF paper)
-    for quantization in ["uint8", "float16", "float32"]:
+    # Export TFLite — float16 only (canonical quantization)
+    for quantization in ["float16"]:
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
         converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
@@ -234,7 +234,7 @@ def main():
         X, y, test_size=0.2, random_state=42, stratify=stratify
     )
 
-    for num_layers, hidden_units in [(0, 0), (1, 50), (1, 100), (2, 50)]:
+    for num_layers, hidden_units in [(0, 0)]:
         print(f"\n{'='*60}")
         print(f"Architecture: L={num_layers}, H={hidden_units}")
         print(f"{'='*60}")

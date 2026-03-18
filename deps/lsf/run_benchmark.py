@@ -106,6 +106,25 @@ def _train_models_locally(data_dir, dataset_name):
     return True
 
 
+def _evaluate_models_locally(data_dir, dataset_name):
+    """Evaluate all TFLite models via batched inference. Returns (best_filename, eval_json) or None."""
+    eval_script = os.path.join(_dir, "evaluate_models.py")
+    result = subprocess.run(
+        [sys.executable, eval_script, data_dir, dataset_name],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        sys.stderr.write(f"Model evaluation failed:\n{result.stderr}\n")
+        return None
+    sys.stderr.write(result.stderr)
+    best_filename = result.stdout.strip()
+
+    eval_json_path = os.path.join(data_dir, f"{dataset_name}_model_eval.json")
+    with open(eval_json_path) as f:
+        eval_data = json.load(f)
+    return best_filename, eval_data
+
+
 def _native_bench_available():
     return os.path.isfile(_NATIVE_BENCH_BIN)
 
@@ -130,12 +149,19 @@ def run_lsf_native(keys, values, competitor="all", seed=42, learned=False, token
         output_prefix = os.path.join(data_dir, DATASET_NAME)
         write_lrbin(keys, values, output_prefix, tokenizer=tokenizer)
 
+        eval_data = None
         if learned:
             cache_dir = os.path.join(MODEL_CACHE_DIR, _cache_key(keys, values, tokenizer=tokenizer))
             if not _restore_from_cache(cache_dir, data_dir, DATASET_NAME):
                 if not _train_models_locally(data_dir, DATASET_NAME):
                     return None
                 _cache_models(data_dir, DATASET_NAME, cache_dir)
+
+            # Evaluate all models in Python (batched, fast) and pick the best
+            eval_result = _evaluate_models_locally(data_dir, DATASET_NAME)
+            if eval_result is None:
+                return None
+            best_filename, eval_data = eval_result
 
         env = os.environ.copy()
         env["DYLD_LIBRARY_PATH"] = _LSF_BUILD_DIR + ":" + env.get("DYLD_LIBRARY_PATH", "")
@@ -164,6 +190,11 @@ def run_lsf_native(keys, values, competitor="all", seed=42, learned=False, token
             if parsed:
                 results.append(parsed)
 
+        # Enrich C++ results with Python-evaluated cross-entropy for all models
+        if eval_data:
+            for r in results:
+                r["_eval_data"] = eval_data
+
         return results
 
 
@@ -190,38 +221,42 @@ def results_to_json(results, keys, values, competitor, tokenizer="md5"):
 
     out = []
 
-    # Pick best learned model by lowest total bpk
+    # Pick best learned model by lowest actual total bpk (storage + model)
     if ours_candidates:
-        # Deduplicate training time by architecture (each arch has 3 quantizations
-        # that share the same training_seconds)
+        # Build per-model data from actual C++ results
+        all_models = []
         seen_archs = {}
         for r in ours_candidates:
+            total_bpk = r.get("storage_bits", 0) + r.get("model_bits", 0)
             arch_key = (r.get("model_l"), r.get("model_h"))
             if arch_key not in seen_archs:
                 seen_archs[arch_key] = r.get("training_seconds", 0)
-        total_training_seconds = sum(seen_archs.values())
-        best = min(
-            ours_candidates,
-            key=lambda r: r.get("storage_bits", 0) + r.get("model_bits", 0),
-        )
-        comp = best.get("comp", competitor)
-        storage = best.get("storage_name", "unknown")
-        name = f"lsf_{comp}_{storage}".lower().replace(" ", "_")
-
-        # Build full per-model data for reproducibility
-        all_models = []
-        for r in ours_candidates:
+            # Get Python cross-entropy if available
+            py_ce = None
+            eval_data = r.get("_eval_data")
+            if eval_data:
+                model_name = r.get("model_name", "")
+                for m in eval_data["models"]:
+                    if m["filename"] == model_name:
+                        py_ce = m.get("cross_entropy_bpk")
+                        break
             all_models.append({
                 "arch": f"L{r.get('model_l', '?')}_H{r.get('model_h', '?')}",
                 "quant": r.get("quant", "?"),
                 "storage_bpk": r.get("storage_bits", 0),
                 "model_bpk": r.get("model_bits", 0),
-                "total_bpk": r.get("storage_bits", 0) + r.get("model_bits", 0),
-                "training_seconds": r.get("training_seconds", 0),
-                "cross_entropy_bpk": r.get("cross_entropy_bit_per_key"),
+                "total_bpk": total_bpk,
+                "cross_entropy_bpk": py_ce,
                 "query_nanos": r.get("query_nanos", 0),
                 "construct_ms": r.get("construct_ms", 0),
+                "training_seconds": r.get("training_seconds", 0),
             })
+        total_training_seconds = sum(seen_archs.values())
+
+        best = min(ours_candidates, key=lambda r: r.get("storage_bits", 0) + r.get("model_bits", 0))
+        comp = best.get("comp", competitor)
+        storage = best.get("storage_name", "unknown")
+        name = f"lsf_{comp}_{storage}".lower().replace(" ", "_")
 
         out.append({
             "method": name,
@@ -244,11 +279,8 @@ def results_to_json(results, keys, values, competitor, tokenizer="md5"):
                 "competitor": comp,
                 "storage": storage,
                 "tokenizer": tokenizer,
-                "cross_entropy_bits_per_key": best.get(
-                    "cross_entropy_bit_per_key"
-                ),
                 "best_model": f"L{best.get('model_l', '?')}_H{best.get('model_h', '?')}_{best.get('quant', '?')}",
-                "num_models_evaluated": len(ours_candidates),
+                "num_models_evaluated": len(all_models),
                 "all_models": all_models,
             },
         })

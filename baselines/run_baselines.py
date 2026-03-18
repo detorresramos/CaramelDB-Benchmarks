@@ -27,12 +27,6 @@ import numpy as np
 _dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_dir, ".."))
 
-from shared.data_gen import (
-    MINORITY_DISTRIBUTIONS,
-    compute_actual_alpha,
-    gen_alpha_values,
-    gen_keys,
-)
 from baselines.methods import (
     CppHashTable,
     CSFFilter,
@@ -41,6 +35,16 @@ from baselines.methods import (
     JavaMPH,
     LSFLearned,
 )
+
+
+def _import_data_gen():
+    from shared.data_gen import (
+        MINORITY_DISTRIBUTIONS,
+        compute_actual_alpha,
+        gen_alpha_values,
+        gen_keys,
+    )
+    return MINORITY_DISTRIBUTIONS, compute_actual_alpha, gen_alpha_values, gen_keys
 
 FIGURES_DIR = os.path.join(_dir, "figures")
 DATA_DIR = os.path.join(FIGURES_DIR, "data")
@@ -166,8 +170,10 @@ def run_experiment(
     methods = set(methods)
 
     if keys is None:
+        _, _, gen_alpha_values, gen_keys = _import_data_gen()
         keys = gen_keys(n)
         values = gen_alpha_values(n, alpha, seed=seed, minority_dist=minority_dist)
+    _, compute_actual_alpha, _, _ = _import_data_gen()
     actual_alpha = compute_actual_alpha(values)
 
     results = []
@@ -290,7 +296,7 @@ def parse_args():
     )
     parser.add_argument(
         "--minority-dist",
-        choices=MINORITY_DISTRIBUTIONS,
+        choices=SWEEP_DISTS,
         nargs="+",
         default=None,
         help="Minority distributions (one or more). Omit for default sweep.",
@@ -330,6 +336,7 @@ def main():
 
     if args.dataset is not None:
         keys, values = load_dataset(args.dataset)
+        _, compute_actual_alpha, _, _ = _import_data_gen()
         alpha = float(compute_actual_alpha(values))
         n = len(keys)
         dataset_name = os.path.splitext(os.path.basename(args.dataset))[0]

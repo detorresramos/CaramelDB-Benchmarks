@@ -6,16 +6,23 @@ import sys
 import tempfile
 import warnings
 
-import carameldb
 import numpy as np
 
 _dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_dir, ".."))
 
-from shared import theory
-from shared.data_gen import compute_actual_alpha
-from shared.measure import create_filter_config
-from shared.shibuya import empirical_entropy, shibuya_bloom_params
+
+def _import_carameldb():
+    import carameldb
+    return carameldb
+
+
+def _import_shared():
+    from shared import theory
+    from shared.data_gen import compute_actual_alpha
+    from shared.measure import create_filter_config
+    from shared.shibuya import empirical_entropy, shibuya_bloom_params
+    return theory, compute_actual_alpha, create_filter_config, empirical_entropy, shibuya_bloom_params
 
 
 def _hash_table_memory(keys, values):
@@ -82,6 +89,7 @@ class CppHashTable:
 
     @staticmethod
     def construct(keys, values):
+        carameldb = _import_carameldb()
         return carameldb.UnorderedMapBaseline(keys, np.array(values, dtype=np.uint32).tolist())
 
     @staticmethod
@@ -99,6 +107,7 @@ EPSILON_STRATEGIES = ("optimal", "shibuya")
 
 
 def _find_optimal_params(filter_type, keys, values):
+    theory, compute_actual_alpha, _, _, _ = _import_shared()
     n = len(keys)
     alpha = compute_actual_alpha(values)
     n_over_N = len(np.unique(values)) / n
@@ -118,6 +127,7 @@ def _find_optimal_params(filter_type, keys, values):
 
 
 def _find_shibuya_params(keys, values):
+    _, compute_actual_alpha, _, empirical_entropy, shibuya_bloom_params = _import_shared()
     alpha = compute_actual_alpha(values)
     H0 = empirical_entropy(values)
     result = shibuya_bloom_params(alpha, H0)
@@ -144,6 +154,8 @@ class CSFFilter:
         self._params = None
 
     def construct(self, keys, values):
+        carameldb = _import_carameldb()
+        _, _, create_filter_config, _, _ = _import_shared()
         if self.epsilon_strategy == "optimal":
             self._params = _find_optimal_params(self.filter_type, keys, values)
         else:
