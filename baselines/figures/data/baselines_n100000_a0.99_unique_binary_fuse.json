@@ -206,9 +206,9 @@
     },
     {
       "method": "lsf_ours_filtered-huffman_opt",
-      "construction_time_s": 21.925185458004925,
+      "construction_time_s": 17.30256837499684,
       "inference_ns": {
-        "mean": 37184
+        "mean": 36164.993333
       },
       "memory": {
         "serialized": 20155,
@@ -218,7 +218,22 @@
       "filter_params": {
         "competitor": "ours",
         "storage": "Filtered-Huffman_Opt",
-        "cross_entropy_bits_per_key": 0.181079
+        "tokenizer": "md5",
+        "best_model": "L0_H0_float16",
+        "num_models_evaluated": 1,
+        "all_models": [
+          {
+            "arch": "L0_H0",
+            "quant": "float16",
+            "storage_bpk": 1.13192,
+            "model_bpk": 0.48048,
+            "total_bpk": 1.6124,
+            "cross_entropy_bpk": 0.17986688017845154,
+            "query_nanos": 36164.993333,
+            "construct_ms": 6988.001,
+            "training_seconds": 10.314567374996841
+          }
+        ]
       },
       "filter_type": null
     }

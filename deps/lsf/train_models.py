@@ -139,7 +139,7 @@ def train_and_export(data_dir, dataset_name, X_train, X_test, y_train, y_test,
     model.fit(
         X_train, y_train,
         epochs=100,
-        batch_size=128,
+        batch_size=min(4096, len(X_train)),
         verbose=2,
         validation_split=0.1,
         callbacks=[early_stop],
@@ -234,7 +234,7 @@ def main():
         X, y, test_size=0.2, random_state=42, stratify=stratify
     )
 
-    for num_layers, hidden_units in [(0, 0)]:
+    for num_layers, hidden_units in [(0, 0), (1, 50), (1, 100), (2, 50)]:
         print(f"\n{'='*60}")
         print(f"Architecture: L={num_layers}, H={hidden_units}")
         print(f"{'='*60}")
